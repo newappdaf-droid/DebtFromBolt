@@ -1,18 +1,13 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
+import { useTranslation as useI18nTranslation } from 'react-i18next';
+import { SUPPORTED_LANGUAGES } from '@/i18n';
 
 export interface Language {
   code: string;
   name: string;
   nativeName: string;
+  flag: string;
 }
-
-export const SUPPORTED_LANGUAGES: Language[] = [
-  { code: 'en', name: 'English', nativeName: 'English' },
-  { code: 'de', name: 'German', nativeName: 'Deutsch' },
-  { code: 'fr', name: 'French', nativeName: 'Français' },
-  { code: 'es', name: 'Spanish', nativeName: 'Español' },
-  { code: 'sq', name: 'Albanian', nativeName: 'Shqip' },
-];
 
 interface LanguageContextType {
   currentLanguage: string;
@@ -24,29 +19,11 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [currentLanguage, setCurrentLanguage] = useState<string>(() => {
-    // Try to get saved language from localStorage, fallback to browser language or English
-    const savedLanguage = localStorage.getItem('app-language');
-    if (savedLanguage && SUPPORTED_LANGUAGES.some(lang => lang.code === savedLanguage)) {
-      return savedLanguage;
-    }
-    
-    // Try to match browser language
-    const browserLanguage = navigator.language.split('-')[0];
-    if (SUPPORTED_LANGUAGES.some(lang => lang.code === browserLanguage)) {
-      return browserLanguage;
-    }
-    
-    return 'en'; // Default to English
-  });
+  const { i18n } = useI18nTranslation();
 
-  const setLanguage = (languageCode: string) => {
+  const setLanguage = async (languageCode: string) => {
     if (SUPPORTED_LANGUAGES.some(lang => lang.code === languageCode)) {
-      setCurrentLanguage(languageCode);
-      localStorage.setItem('app-language', languageCode);
-      
-      // Set the HTML lang attribute for accessibility and SEO
-      document.documentElement.lang = languageCode;
+      await i18n.changeLanguage(languageCode);
     }
   };
 
@@ -55,13 +32,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const getLanguageInfo = (code: string) => 
     SUPPORTED_LANGUAGES.find(lang => lang.code === code);
 
-  useEffect(() => {
-    // Set initial HTML lang attribute
-    document.documentElement.lang = currentLanguage;
-  }, [currentLanguage]);
-
   const value: LanguageContextType = {
-    currentLanguage,
+    currentLanguage: i18n.language,
     setLanguage,
     getSupportedLanguages,
     getLanguageInfo,

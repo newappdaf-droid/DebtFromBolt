@@ -29,7 +29,7 @@ import {
   getApprovalsForUser, 
   getInvoicesForUser 
 } from '@/lib/mockData';
-import { useTranslation } from '@/contexts/TranslationContext';
+import { useTranslation } from '@/hooks/useTranslation';
 import { cn } from '@/lib/utils';
 
 interface DashboardCardProps {
@@ -111,17 +111,17 @@ export default function Dashboard() {
     switch (user.role) {
       case 'CLIENT':
         return {
-          title: t('clientDashboard'),
-          subtitle: t('clientDashboardSubtitle'),
+          title: t('dashboard.clientDashboard'),
+          subtitle: t('dashboard.clientDashboardSubtitle'),
           primaryActions: [
             {
-              label: t('createNewCase'),
+              label: t('dashboard.createNewCase'),
               icon: FileText,
               onClick: () => navigate('/cases/new'),
               variant: 'default' as const,
             },
             {
-              label: t('viewAllCases'),
+              label: t('dashboard.viewAllCases'),
               icon: Users,
               onClick: () => navigate('/cases'),
               variant: 'outline' as const,
@@ -130,17 +130,17 @@ export default function Dashboard() {
         };
       case 'AGENT':
         return {
-          title: t('agentDashboard'),
-          subtitle: t('agentDashboardSubtitle'),
+          title: t('dashboard.agentDashboard'),
+          subtitle: t('dashboard.agentDashboardSubtitle'),
           primaryActions: [
             {
-              label: t('myCases'),
+              label: t('dashboard.myCases'),
               icon: FileText,
               onClick: () => navigate('/cases'),
               variant: 'default' as const,
             },
             {
-              label: t('recentActivity'),
+              label: t('dashboard.recentActivity'),
               icon: Activity,
               onClick: () => navigate('/cases?filter=recent'),
               variant: 'outline' as const,
@@ -149,17 +149,17 @@ export default function Dashboard() {
         };
       case 'ADMIN':
         return {
-          title: t('adminDashboard'),
-          subtitle: t('adminDashboardSubtitle'),
+          title: t('dashboard.adminDashboard'),
+          subtitle: t('dashboard.adminDashboardSubtitle'),
           primaryActions: [
             {
-              label: t('manageUsers'),
+              label: t('dashboard.manageUsers'),
               icon: Users,
               onClick: () => navigate('/admin/users'),
               variant: 'default' as const,
             },
             {
-              label: t('reviewApprovals'),
+              label: t('dashboard.reviewApprovals'),
               icon: CheckCircle,
               onClick: () => navigate('/approvals'),
               variant: 'outline' as const,
@@ -168,17 +168,17 @@ export default function Dashboard() {
         };
       case 'DPO':
         return {
-          title: t('dataProtectionDashboard'),
-          subtitle: t('dpoDashboardSubtitle'),
+          title: t('dashboard.dataProtectionDashboard'),
+          subtitle: t('dashboard.dpoDashboardSubtitle'),
           primaryActions: [
             {
-              label: t('gdprRequestsNav'),
+              label: t('dashboard.gdprRequestsNav'),
               icon: Shield,
               onClick: () => navigate('/gdpr'),
               variant: 'default' as const,
             },
             {
-              label: t('dpoTools'),
+              label: t('dashboard.dpoTools'),
               icon: Scale,
               onClick: () => navigate('/dpo'),
               variant: 'outline' as const,
@@ -187,8 +187,8 @@ export default function Dashboard() {
         };
       default:
         return {
-          title: t('dashboardTitle'),
-          subtitle: `${t('welcomeBack')} CollectPro`,
+          title: t('dashboard.title'),
+          subtitle: `${t('auth.welcomeBack')} CollectPro`,
           primaryActions: [],
         };
     }
@@ -222,30 +222,30 @@ export default function Dashboard() {
       {/* Key Metrics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <DashboardCard
-          title={t('totalCases')}
+          title={t('dashboard.totalCases')}
           value={userCases.length}
-          description={t('allCasesAccess')}
+          description={t('dashboard.allCasesAccess')}
           icon={FileText}
           onClick={() => navigate('/cases')}
         />
         <DashboardCard
-          title={t('activeCases')}
+          title={t('dashboard.activeCases')}
           value={userCases.filter(c => ['new', 'in_progress', 'awaiting_approval', 'legal_stage'].includes(c.status)).length}
-          description={t('currentlyBeingProcessed')}
+          description={t('dashboard.currentlyBeingProcessed')}
           icon={Clock}
           onClick={() => navigate('/cases?status=active')}
         />
         <DashboardCard
-          title={t('pendingApprovals')}
+          title={t('dashboard.pendingApprovals')}
           value={pendingApprovals.length}
-          description={t('awaitingYourDecision')}
+          description={t('dashboard.awaitingYourDecision')}
           icon={AlertTriangle}
           onClick={() => navigate('/approvals')}
         />
         <DashboardCard
-          title={t('successRate')}
+          title={t('dashboard.successRate')}
           value={`${stats.successRate}%`}
-          description={t('casesSuccessfullyResolved')}
+          description={t('dashboard.casesSuccessfullyResolved')}
           icon={Target}
           trend={5.2}
         />

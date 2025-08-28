@@ -32,7 +32,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { useTranslation } from '@/contexts/TranslationContext';
+import { useTranslation } from '@/hooks/useTranslation';
 import { cn } from '@/lib/utils';
 
 const navigationItems = [
@@ -182,10 +182,10 @@ export function AppSidebar() {
             {!collapsed && (
               <div>
                 <h1 className="text-lg font-semibold text-sidebar-foreground">
-                  {t('collectPro')}
+                  {t('app.name')}
                 </h1>
                 <p className="text-xs text-sidebar-foreground/60">
-                  {t('debtCollectionPlatform')}
+                  {t('app.tagline')}
                 </p>
               </div>
             )}
@@ -215,7 +215,7 @@ export function AppSidebar() {
 
         {/* Main Navigation */}
         <SidebarGroup>
-          <SidebarGroupLabel>{t('navigation')}</SidebarGroupLabel>
+          <SidebarGroupLabel>{t('navigation.dashboard')}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {filteredMainItems.map((item) => (
@@ -235,7 +235,7 @@ export function AppSidebar() {
         {/* Admin Section */}
         {filteredAdminItems.length > 0 && (
           <SidebarGroup>
-            <SidebarGroupLabel>{t('administration')}</SidebarGroupLabel>
+            <SidebarGroupLabel>{t('navigation.administration')}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {filteredAdminItems.map((item) => (
@@ -256,7 +256,7 @@ export function AppSidebar() {
         {/* DPO Section */}
         {filteredDpoItems.length > 0 && (
           <SidebarGroup>
-            <SidebarGroupLabel>{t('dataProtection')}</SidebarGroupLabel>
+            <SidebarGroupLabel>{t('navigation.dataProtection')}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {filteredDpoItems.map((item) => (
@@ -277,7 +277,7 @@ export function AppSidebar() {
         {/* User Section */}
         {filteredUserItems.length > 0 && (
           <SidebarGroup>
-            <SidebarGroupLabel>{t('account')}</SidebarGroupLabel>
+            <SidebarGroupLabel>{t('navigation.account')}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {filteredUserItems.map((item) => (

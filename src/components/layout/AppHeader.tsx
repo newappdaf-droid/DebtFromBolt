@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Bell, LogOut, User, Settings } from 'lucide-react';
+import { Bell, LogOut, User, Settings, Globe } from 'lucide-react';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,8 +16,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/components/auth/AuthProvider';
-import { useTranslation } from '@/contexts/TranslationContext';
+import { useTranslation } from '@/hooks/useTranslation';
 import { NotificationsBell } from './NotificationsBell';
+import { LanguageSelector } from '@/components/ui/language-selector';
 
 export function AppHeader() {
   const location = useLocation();
@@ -95,6 +96,9 @@ export function AppHeader() {
 
         {/* Right side - Notifications and user menu */}
         <div className="flex items-center gap-3">
+          {/* Language Selector */}
+          <LanguageSelector variant="compact" />
+          
           {/* Notifications */}
           <NotificationsBell />
 
