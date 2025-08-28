@@ -26,21 +26,22 @@ export function AppHeader() {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
 
-  const pageNames: Record<string, string> = {
-    '/dashboard': t('dashboard'),
-    '/cases': t('caseManagement'),
-    '/cases/new': t('newCase'),
-    '/approvals': t('approvals'),
-    '/invoices': t('invoices'),
-    '/gdpr': t('gdprRequests'),
-    '/profile': t('profile'),
-    '/settings': t('settings'),
-    '/admin/users': t('userManagement'),
-    '/admin/tariffs': t('tariffManagement'),
-    '/admin/templates': t('messageTemplates'),
-    '/admin/retention': t('retentionPolicy'),
-    '/dpo': t('dataProtectionOffice'),
-  };
+const pageNames: Record<string, string> = {
+  '/dashboard': t('dashboard.title'),
+  '/cases': t('caseManagement.title'),
+  '/cases/new': t('caseManagement.new'),
+  '/approvals': t('approvals.title'),
+  '/invoices': t('invoices.title'),
+  '/gdpr': t('gdprRequests.title'),
+  '/profile': t('profile.title'),
+  '/settings': t('settings.title'),
+  '/admin/users': t('userManagement.title'),
+  '/admin/tariffs': t('tariffManagement.title'),
+  '/admin/templates': t('messageTemplates.title'),
+  '/admin/retention': t('retentionPolicy.title'),
+  '/dpo': t('dataProtectionOffice.title'),
+};
+
 
 
   const getPageName = () => {
