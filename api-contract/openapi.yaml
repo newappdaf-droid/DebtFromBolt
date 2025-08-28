@@ -1,0 +1,1274 @@
+openapi: 3.0.3
+info:
+  title: CollectPro Cases API
+  description: Professional B2B Debt Collection Platform - Cases 2.0 API
+  version: 2.0.0
+  contact:
+    name: CollectPro API Support
+    email: api-support@collectpro.com
+servers:
+  - url: http://localhost:5000/api
+    description: Development server
+  - url: https://api.collectpro.com/api
+    description: Production server
+
+paths:
+  # Cases Management
+  /cases:
+    get:
+      summary: Get cases list with filtering
+      operationId: getCases
+      parameters:
+        - name: Query
+          in: query
+          schema:
+            type: string
+          description: Free text search
+        - name: ClientId
+          in: query
+          schema:
+            type: string
+        - name: PortfolioId
+          in: query
+          schema:
+            type: string
+        - name: Phase
+          in: query
+          schema:
+            $ref: '#/components/schemas/CasePhase'
+        - name: Zone
+          in: query
+          schema:
+            $ref: '#/components/schemas/CaseZone'
+        - name: Assignee
+          in: query
+          schema:
+            type: string
+        - name: Label
+          in: query
+          schema:
+            type: string
+        - name: DateFrom
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: DateTo
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: Page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: Size
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Cases list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaseListResponse'
+    post:
+      summary: Create new case
+      operationId: createCase
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCaseRequest'
+      responses:
+        '201':
+          description: Case created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaseHeader'
+
+  /cases/{caseId}:
+    get:
+      summary: Get case details
+      operationId: getCaseDetail
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Case details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaseDetailResponse'
+
+  /cases/{caseId}/accept:
+    post:
+      summary: Accept case for processing
+      operationId: acceptCase
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Case accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponse'
+
+  /cases/{caseId}/refuse:
+    post:
+      summary: Refuse case
+      operationId: refuseCase
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Reason:
+                  type: string
+      responses:
+        '200':
+          description: Case refused
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponse'
+
+  /cases/{caseId}/assign:
+    post:
+      summary: Assign case to user
+      operationId: assignCase
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignCaseRequest'
+      responses:
+        '200':
+          description: Case assigned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assignment'
+
+  /cases/{caseId}/labels:
+    post:
+      summary: Update case labels
+      operationId: updateCaseLabels
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Labels:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Labels updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Labels:
+                    type: array
+                    items:
+                      type: string
+
+  # Phase & Escalation
+  /cases/{caseId}/change-zone:
+    post:
+      summary: Change case zone
+      operationId: changeZone
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeZoneRequest'
+      responses:
+        '200':
+          description: Zone changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponse'
+
+  /cases/{caseId}/escalations:
+    post:
+      summary: Create escalation request
+      operationId: createEscalation
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEscalationRequest'
+      responses:
+        '201':
+          description: Escalation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EscalationRequest'
+
+  /cases/{caseId}/escalations/{escalationId}/approve:
+    post:
+      summary: Approve escalation request
+      operationId: approveEscalation
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: escalationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Escalation approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PhaseChange'
+
+  /cases/{caseId}/escalations/{escalationId}/reject:
+    post:
+      summary: Reject escalation request
+      operationId: rejectEscalation
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: escalationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Escalation rejected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EscalationRequest'
+
+  # History
+  /cases/{caseId}/history:
+    get:
+      summary: Get case history
+      operationId: getCaseHistory
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: view
+          in: query
+          schema:
+            type: string
+            enum: [detailed, compact]
+            default: detailed
+      responses:
+        '200':
+          description: Case history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CaseHistoryItem'
+
+  # Messages
+  /cases/{caseId}/messages:
+    get:
+      summary: Get case messages
+      operationId: getCaseMessages
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Case messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CaseMessage'
+    post:
+      summary: Create case message
+      operationId: createCaseMessage
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMessageRequest'
+      responses:
+        '201':
+          description: Message created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaseMessage'
+
+  # Activities & PTP
+  /cases/{caseId}/activities:
+    get:
+      summary: Get case activities
+      operationId: getCaseActivities
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Case activities
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CaseActivity'
+    post:
+      summary: Create case activity
+      operationId: createCaseActivity
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateActivityRequest'
+      responses:
+        '201':
+          description: Activity created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaseActivity'
+
+  /cases/{caseId}/ptp:
+    post:
+      summary: Create promise to pay
+      operationId: createPtp
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePtpRequest'
+      responses:
+        '201':
+          description: Promise to pay created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromiseToPay'
+
+  /cases/{caseId}/ptp/{ptpId}/close:
+    post:
+      summary: Close promise to pay
+      operationId: closePtp
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: ptpId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClosePtpRequest'
+      responses:
+        '200':
+          description: Promise to pay closed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromiseToPay'
+
+  # Finance
+  /cases/{caseId}/finance:
+    get:
+      summary: Get case finance details
+      operationId: getCaseFinance
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Case finance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaseFinance'
+
+  /cases/{caseId}/payments:
+    post:
+      summary: Record payment
+      operationId: createPayment
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentRequest'
+      responses:
+        '201':
+          description: Payment recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+
+  # Documents
+  /cases/{caseId}/documents:
+    get:
+      summary: Get case documents
+      operationId: getCaseDocuments
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Case documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CaseDocument'
+
+  /cases/{caseId}/documents/upload-init:
+    post:
+      summary: Initialize document upload
+      operationId: initDocumentUpload
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentUploadInitRequest'
+      responses:
+        '200':
+          description: Upload initialized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentUploadInitResponse'
+
+  /cases/{caseId}/documents/commit:
+    post:
+      summary: Commit uploaded document
+      operationId: commitDocument
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentCommitRequest'
+      responses:
+        '201':
+          description: Document committed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaseDocument'
+
+  # Import
+  /cases/import:
+    post:
+      summary: Import cases from CSV
+      operationId: importCases
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportCasesRequest'
+      responses:
+        '200':
+          description: Import results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportCasesResponse'
+
+components:
+  schemas:
+    # Enums
+    CasePhase:
+      type: string
+      enum: [Soft, Field, Legal, Bailiff, Closed]
+    
+    CaseZone:
+      type: string
+      enum: [PreLegal, Legal, Bailiff]
+    
+    CaseType:
+      type: string
+      enum: [B2C, B2B]
+    
+    ActivityType:
+      type: string
+      enum: [Call, SMS, Email, Visit, Verification, Dispute, PTP, Other]
+    
+    ActivityOutcome:
+      type: string
+      enum: [Reached, NoAnswer, WrongNumber, Paid, Promise, BrokenPromise, DisputeOpen, DisputeClosed, Other]
+    
+    EscalationStatus:
+      type: string
+      enum: [Pending, Approved, Rejected]
+    
+    CaseStatus:
+      type: string
+      enum: [PendingAcceptance, Active, Refused, Closed]
+    
+    Priority:
+      type: string
+      enum: [Low, Medium, High]
+    
+    Currency:
+      type: string
+      enum: [EUR, USD, GBP]
+    
+    PaymentMethod:
+      type: string
+      enum: [Bank, Cash, Card, Other]
+    
+    DocumentType:
+      type: string
+      enum: [Invoice, PoA, CourtFiling, ProofOfPayment, ID, Other]
+    
+    HistoryType:
+      type: string
+      enum: [Created, FieldChanged, Assignment, Message, Activity, Payment, Document, Escalation, PhaseChange, Note]
+    
+    PtpStatus:
+      type: string
+      enum: [Open, Kept, Broken]
+
+    # Core Entities
+    CaseSummary:
+      type: object
+      required: [CaseId, CaseNumber, Phase, Zone, Status, OpenedAt, Labels]
+      properties:
+        CaseId:
+          type: string
+        CaseNumber:
+          type: string
+        Phase:
+          $ref: '#/components/schemas/CasePhase'
+        Zone:
+          $ref: '#/components/schemas/CaseZone'
+        Status:
+          $ref: '#/components/schemas/CaseStatus'
+        AssignedToUserId:
+          type: string
+          nullable: true
+        Priority:
+          $ref: '#/components/schemas/Priority'
+          nullable: true
+        OpenedAt:
+          type: string
+          format: date-time
+        AcceptedAt:
+          type: string
+          format: date-time
+          nullable: true
+        ClosedAt:
+          type: string
+          format: date-time
+          nullable: true
+        Labels:
+          type: array
+          items:
+            type: string
+
+    CaseHeader:
+      allOf:
+        - $ref: '#/components/schemas/CaseSummary'
+        - type: object
+          required: [PortfolioId, ClientId, DebtorId, CaseType]
+          properties:
+            PortfolioId:
+              type: string
+            ClientId:
+              type: string
+            CreditorId:
+              type: string
+              nullable: true
+            SendingPartnerId:
+              type: string
+              nullable: true
+            DebtorId:
+              type: string
+            CaseType:
+              $ref: '#/components/schemas/CaseType'
+            ProcessType:
+              type: string
+              nullable: true
+            CommissionPct:
+              type: number
+              nullable: true
+
+    CaseFinance:
+      type: object
+      required: [CaseId, Currency, Principal, Fees, Penalties, Interest, PaymentsTotal, NotAllocatedTotal, OpenToPay, UpdatedAt]
+      properties:
+        CaseId:
+          type: string
+        Currency:
+          $ref: '#/components/schemas/Currency'
+        Principal:
+          type: number
+        Fees:
+          type: number
+        Penalties:
+          type: number
+        Interest:
+          type: number
+        PaymentsTotal:
+          type: number
+        NotAllocatedTotal:
+          type: number
+        OpenToPay:
+          type: number
+        UpdatedAt:
+          type: string
+          format: date-time
+
+    CaseHistoryItem:
+      type: object
+      required: [HistoryId, CaseId, When, Type]
+      properties:
+        HistoryId:
+          type: string
+        CaseId:
+          type: string
+        When:
+          type: string
+          format: date-time
+        WhoUserId:
+          type: string
+          nullable: true
+        Type:
+          $ref: '#/components/schemas/HistoryType'
+        Title:
+          type: string
+          nullable: true
+        Body:
+          type: string
+          nullable: true
+        RefTable:
+          type: string
+          nullable: true
+        RefId:
+          type: string
+          nullable: true
+
+    CaseMessage:
+      type: object
+      required: [MessageId, CaseId, ThreadId, Body, HasAttachments, CreatedAt]
+      properties:
+        MessageId:
+          type: string
+        CaseId:
+          type: string
+        ThreadId:
+          type: string
+        FromOrgId:
+          type: string
+          nullable: true
+        FromUserId:
+          type: string
+          nullable: true
+        ToOrgId:
+          type: string
+          nullable: true
+        Body:
+          type: string
+        HasAttachments:
+          type: boolean
+        ReadAt:
+          type: string
+          format: date-time
+          nullable: true
+        CreatedAt:
+          type: string
+          format: date-time
+
+    CaseActivity:
+      type: object
+      required: [ActivityId, CaseId, Type, CreatedAt]
+      properties:
+        ActivityId:
+          type: string
+        CaseId:
+          type: string
+        Type:
+          $ref: '#/components/schemas/ActivityType'
+        Outcome:
+          $ref: '#/components/schemas/ActivityOutcome'
+          nullable: true
+        Note:
+          type: string
+          nullable: true
+        DueAt:
+          type: string
+          format: date-time
+          nullable: true
+        CreatedBy:
+          type: string
+          nullable: true
+        CreatedAt:
+          type: string
+          format: date-time
+
+    PromiseToPay:
+      type: object
+      required: [PtpId, CaseId, PromisedAmount, DueDate, Status, CreatedAt]
+      properties:
+        PtpId:
+          type: string
+        CaseId:
+          type: string
+        PromisedAmount:
+          type: number
+        DueDate:
+          type: string
+          format: date-time
+        Status:
+          $ref: '#/components/schemas/PtpStatus'
+        CreatedAt:
+          type: string
+          format: date-time
+        ClosedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    Payment:
+      type: object
+      required: [PaymentId, CaseId, Amount, Currency, PaidAt, CreatedAt]
+      properties:
+        PaymentId:
+          type: string
+        CaseId:
+          type: string
+        Amount:
+          type: number
+        Currency:
+          $ref: '#/components/schemas/Currency'
+        PaidAt:
+          type: string
+          format: date-time
+        Method:
+          $ref: '#/components/schemas/PaymentMethod'
+          nullable: true
+        ExternalRef:
+          type: string
+          nullable: true
+        CreatedAt:
+          type: string
+          format: date-time
+
+    CaseDocument:
+      type: object
+      required: [DocumentId, CaseId, Type, FileName, MimeType, StorageKey, Size, Version, UploadedAt]
+      properties:
+        DocumentId:
+          type: string
+        CaseId:
+          type: string
+        Type:
+          $ref: '#/components/schemas/DocumentType'
+        FileName:
+          type: string
+        MimeType:
+          type: string
+        StorageKey:
+          type: string
+        Size:
+          type: integer
+        Version:
+          type: integer
+        RetentionPolicyCode:
+          type: string
+          nullable: true
+        UploadedBy:
+          type: string
+          nullable: true
+        UploadedAt:
+          type: string
+          format: date-time
+        Hash:
+          type: string
+          nullable: true
+
+    EscalationRequest:
+      type: object
+      required: [EscalationId, CaseId, FromPhase, ToPhase, RequestedBy, Status]
+      properties:
+        EscalationId:
+          type: string
+        CaseId:
+          type: string
+        FromPhase:
+          $ref: '#/components/schemas/CasePhase'
+        ToPhase:
+          $ref: '#/components/schemas/CasePhase'
+        RequestedBy:
+          type: string
+        Reason:
+          type: string
+          nullable: true
+        Status:
+          $ref: '#/components/schemas/EscalationStatus'
+        DecidedBy:
+          type: string
+          nullable: true
+        DecidedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    PhaseChange:
+      type: object
+      required: [PhaseChangeId, CaseId, FromPhase, ToPhase, ChangedBy, ChangedAt]
+      properties:
+        PhaseChangeId:
+          type: string
+        CaseId:
+          type: string
+        FromPhase:
+          $ref: '#/components/schemas/CasePhase'
+        ToPhase:
+          $ref: '#/components/schemas/CasePhase'
+        ChangedBy:
+          type: string
+        ChangedAt:
+          type: string
+          format: date-time
+        EscalationId:
+          type: string
+          nullable: true
+
+    Assignment:
+      type: object
+      required: [AssignmentId, CaseId, AssignedToUserId, AssignedAt]
+      properties:
+        AssignmentId:
+          type: string
+        CaseId:
+          type: string
+        AssignedToUserId:
+          type: string
+        AssignedByUserId:
+          type: string
+          nullable: true
+        AssignedAt:
+          type: string
+          format: date-time
+
+    # Request/Response Types
+    CaseListResponse:
+      type: object
+      required: [Items, Total]
+      properties:
+        Items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CaseSummary'
+        Total:
+          type: integer
+
+    CaseDetailResponse:
+      type: object
+      required: [Header, Finance]
+      properties:
+        Header:
+          $ref: '#/components/schemas/CaseHeader'
+        Finance:
+          $ref: '#/components/schemas/CaseFinance'
+
+    ApiSuccessResponse:
+      type: object
+      required: [Success]
+      properties:
+        Success:
+          type: boolean
+        AcceptedAt:
+          type: string
+          format: date-time
+          nullable: true
+        Reason:
+          type: string
+          nullable: true
+
+    ApiErrorResponse:
+      type: object
+      required: [Error]
+      properties:
+        Error:
+          type: object
+          required: [Code, Message]
+          properties:
+            Code:
+              type: string
+            Message:
+              type: string
+
+    # Request Types
+    CreateCaseRequest:
+      type: object
+      required: [PortfolioId, ClientId, DebtorId, CaseType, Principal, Currency]
+      properties:
+        PortfolioId:
+          type: string
+        ClientId:
+          type: string
+        DebtorId:
+          type: string
+        CaseType:
+          $ref: '#/components/schemas/CaseType'
+        ProcessType:
+          type: string
+          nullable: true
+        CommissionPct:
+          type: number
+          nullable: true
+        Principal:
+          type: number
+        Currency:
+          $ref: '#/components/schemas/Currency'
+        Labels:
+          type: array
+          items:
+            type: string
+
+    AssignCaseRequest:
+      type: object
+      required: [AssignedToUserId]
+      properties:
+        AssignedToUserId:
+          type: string
+
+    ChangeZoneRequest:
+      type: object
+      required: [Zone]
+      properties:
+        Zone:
+          $ref: '#/components/schemas/CaseZone'
+
+    CreateEscalationRequest:
+      type: object
+      required: [ToPhase]
+      properties:
+        ToPhase:
+          $ref: '#/components/schemas/CasePhase'
+        Reason:
+          type: string
+          nullable: true
+
+    CreateMessageRequest:
+      type: object
+      required: [Body]
+      properties:
+        Body:
+          type: string
+        HasAttachments:
+          type: boolean
+          default: false
+
+    CreateActivityRequest:
+      type: object
+      required: [Type]
+      properties:
+        Type:
+          $ref: '#/components/schemas/ActivityType'
+        Outcome:
+          $ref: '#/components/schemas/ActivityOutcome'
+          nullable: true
+        Note:
+          type: string
+          nullable: true
+        DueAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    CreatePtpRequest:
+      type: object
+      required: [PromisedAmount, DueDate]
+      properties:
+        PromisedAmount:
+          type: number
+        DueDate:
+          type: string
+          format: date-time
+
+    ClosePtpRequest:
+      type: object
+      required: [Status]
+      properties:
+        Status:
+          type: string
+          enum: [Kept, Broken]
+
+    CreatePaymentRequest:
+      type: object
+      required: [Amount, Currency, PaidAt]
+      properties:
+        Amount:
+          type: number
+        Currency:
+          $ref: '#/components/schemas/Currency'
+        PaidAt:
+          type: string
+          format: date-time
+        Method:
+          $ref: '#/components/schemas/PaymentMethod'
+          nullable: true
+        ExternalRef:
+          type: string
+          nullable: true
+
+    DocumentUploadInitRequest:
+      type: object
+      required: [FileName, MimeType, Size, Type]
+      properties:
+        FileName:
+          type: string
+        MimeType:
+          type: string
+        Size:
+          type: integer
+        Type:
+          $ref: '#/components/schemas/DocumentType'
+
+    DocumentUploadInitResponse:
+      type: object
+      required: [UploadUrl, StorageKey]
+      properties:
+        UploadUrl:
+          type: string
+        StorageKey:
+          type: string
+
+    DocumentCommitRequest:
+      type: object
+      required: [StorageKey]
+      properties:
+        StorageKey:
+          type: string
+
+    ImportCasesRequest:
+      type: object
+      required: [FileName, RowCount]
+      properties:
+        FileName:
+          type: string
+        RowCount:
+          type: integer
+
+    ImportCasesResponse:
+      type: object
+      required: [RowsAccepted, RowsRejected, Issues]
+      properties:
+        RowsAccepted:
+          type: integer
+        RowsRejected:
+          type: integer
+        Issues:
+          type: array
+          items:
+            type: string
+
+    CaseFilters:
+      type: object
+      properties:
+        Query:
+          type: string
+          nullable: true
+        ClientId:
+          type: string
+          nullable: true
+        PortfolioId:
+          type: string
+          nullable: true
+        Phase:
+          $ref: '#/components/schemas/CasePhase'
+          nullable: true
+        Zone:
+          $ref: '#/components/schemas/CaseZone'
+          nullable: true
+        Assignee:
+          type: string
+          nullable: true
+        Label:
+          type: string
+          nullable: true
+        DateFrom:
+          type: string
+          format: date-time
+          nullable: true
+        DateTo:
+          type: string
+          format: date-time
+          nullable: true
+        Page:
+          type: integer
+          nullable: true
+        Size:
+          type: integer
+          nullable: true
+
+    # Dictionary Types
+    Dictionary:
+      type: object
+      required: [Code, Name, Active]
+      properties:
+        Code:
+          type: string
+        Name:
+          type: string
+        Active:
+          type: boolean
+
+    SavedView:
+      type: object
+      required: [ViewId, Name, Filters, CreatedAt, UpdatedAt]
+      properties:
+        ViewId:
+          type: string
+        Name:
+          type: string
+        Filters:
+          $ref: '#/components/schemas/CaseFilters'
+        CreatedAt:
+          type: string
+          format: date-time
+        UpdatedAt:
+          type: string
+          format: date-time
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []
