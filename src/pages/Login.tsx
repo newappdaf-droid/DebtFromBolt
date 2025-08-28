@@ -12,8 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useToast } from '@/hooks/use-toast';
-import { useTranslation } from '@/hooks/useTranslation';
-import { LanguageSelector } from '@/components/ui/language-selector';
+import { useTranslation } from '@/contexts/TranslationContext';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -99,21 +98,18 @@ export default function Login() {
           <div className="mx-auto w-16 h-16 bg-primary rounded-2xl flex items-center justify-center">
             <Building2 className="h-8 w-8 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">{t('app.name')}</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t('collectPro')}</h1>
           <p className="text-muted-foreground">
-            {t('app.tagline')}
+            {t('professionalDebtCollection')}
           </p>
         </div>
 
         {/* Login Form */}
         <Card className="card-professional">
           <CardHeader className="space-y-1">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xl">{t('auth.loginTitle')}</CardTitle>
-              <LanguageSelector variant="compact" />
-            </div>
+            <CardTitle className="text-xl text-center">{t('loginTitle')}</CardTitle>
             <CardDescription className="text-center">
-              {t('auth.loginDescription')}
+              {t('loginDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -128,7 +124,7 @@ export default function Login() {
               {/* Email Field */}
               <div className="form-field">
                 <Label htmlFor="email" className="form-label">
-                  {t('auth.email')}
+                  Email Address
                 </Label>
                 <Input
                   id="email"
@@ -145,7 +141,7 @@ export default function Login() {
               {/* Password Field */}
               <div className="form-field">
                 <Label htmlFor="password" className="form-label">
-                  {t('auth.password')}
+                  Password
                 </Label>
                 <div className="relative">
                   <Input
@@ -204,7 +200,7 @@ export default function Login() {
                 className="w-full"
                 disabled={isLoading || !email || !password || !acceptTerms}
               >
-                {isLoading ? t('forms.loading') : t('auth.login')}
+                {isLoading ? 'Signing in...' : 'Sign In'}
               </Button>
             </form>
           </CardContent>
