@@ -384,12 +384,8 @@ const translations = {
     cancelled: 'Storniert',
     // Preferences
     preferencesTitle: 'Préférences',
-  t: (key: string, options?: any) => string;
-  changeLanguage: (languageCode: string) => Promise<void>;
-  getCurrentLanguage: () => string;
-  formatCurrency: (amount: number, currency?: string) => string;
-  formatDate: (date: Date | string, options?: Intl.DateTimeFormatOptions) => string;
-  formatRelativeTime: (date: Date | string) => string;
+    preferencesDesc: 'Personnalisez votre expérience d\'application',
+    language: 'Langue',
     selectLanguage: 'Sélectionner la langue',
     timezone: 'Fuseau horaire',
     selectTimezone: 'Sélectionner le fuseau horaire',
@@ -830,7 +826,7 @@ const translations = {
     caseUpdates: 'Përditësimet e rasteve',
     caseUpdatesDesc: 'Merr njoftim kur përditësohen rastet',
     approvalRequests: 'Kërkesa për miratim',
-    aprovalRequestsDesc: 'Merr njoftim për miratimet në pritje',
+    approvalRequestsDesc: 'Merr njoftim për miratimet në pritje',
     gdprRequestsNotif: 'Kërkesa GDPR',
     gdprRequestsDesc: 'Merr njoftim për aktivitetet e lidhura me GDPR',
     saveNotificationSettings: 'Ruaj cilësimet e njoftimeve',
@@ -877,7 +873,12 @@ const translations = {
 };
 
 interface TranslationContextType {
-  t: (key: string) => string;
+  t: (key: string, options?: any) => string;
+  changeLanguage: (languageCode: string) => Promise<void>;
+  getCurrentLanguage: () => string;
+  formatCurrency: (amount: number, currency?: string) => string;
+  formatDate: (date: Date | string, options?: Intl.DateTimeFormatOptions) => string;
+  formatRelativeTime: (date: Date | string) => string;
 }
 
 const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
@@ -899,6 +900,7 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
     formatCurrency,
     formatDate,
     formatRelativeTime,
+  };
 
   return (
     <TranslationContext.Provider value={value}>
