@@ -39,8 +39,8 @@ const App = () => (
           <AuthProvider>
             <Toaster />
             <Sonner />
-            <AIAssistant />
             <BrowserRouter>
+              <AIAssistant />
           <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
