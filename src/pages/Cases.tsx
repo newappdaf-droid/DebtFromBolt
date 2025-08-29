@@ -23,6 +23,7 @@ import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { casesApi } from '@/lib/api/casesApi';
 import { CaseSummary, CaseFilters, SavedView, CasePhase, CaseZone } from '@/types/cases';
+import { AIHelpButton } from '@/components/ai/AIHelpButton';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -290,6 +291,7 @@ export default function Cases() {
               </DropdownMenuContent>
             </DropdownMenu>
           )}
+          <AIHelpButton onOpenAI={() => {}} />
           <Button
             variant="outline"
             size="sm"

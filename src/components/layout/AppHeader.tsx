@@ -17,6 +17,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { useTranslation } from '@/contexts/TranslationContext';
+import { AIHelpButton } from '@/components/ai/AIHelpButton';
 import { NotificationsBell } from './NotificationsBell';
 
 export function AppHeader() {
@@ -95,6 +96,12 @@ export function AppHeader() {
 
         {/* Right side - Notifications and user menu */}
         <div className="flex items-center gap-3">
+          {/* AI Help Button */}
+          <AIHelpButton onOpenAI={() => {
+            // The AI Assistant is always available via the floating button
+            // This could trigger opening it or scrolling to it
+          }} />
+          
           {/* Notifications */}
           <NotificationsBell />
 
