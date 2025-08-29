@@ -51,6 +51,7 @@ import { toast } from '@/hooks/use-toast';
 
 import { useAuth } from '@/components/auth/AuthProvider';
 import { getApprovalsForUser } from '@/lib/mockData';
+import { AIHelpButton } from '@/components/ai/AIHelpButton';
 import type { Approval } from '@/types';
 
 const statusConfig = {
@@ -223,6 +224,7 @@ export default function Approvals() {
         {stats.pending > 0 && user?.role === 'ADMIN' && (
           <Badge variant="outline" className="text-sm py-2 px-4 border-warning text-warning">
             {stats.pending} Pending Review{stats.pending > 1 ? 's' : ''}
+            <AIHelpButton onOpenAI={() => {}} className="ml-2" />
           </Badge>
         )}
       </div>

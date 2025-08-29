@@ -29,6 +29,7 @@ import {
   getApprovalsForUser, 
   getInvoicesForUser 
 } from '@/lib/mockData';
+import { AIHelpButton } from '@/components/ai/AIHelpButton';
 import { useTranslation } from '@/contexts/TranslationContext';
 import { cn } from '@/lib/utils';
 
@@ -216,6 +217,7 @@ export default function Dashboard() {
               {action.label}
             </Button>
           ))}
+          <AIHelpButton onOpenAI={() => {}} />
         </div>
       </div>
 
