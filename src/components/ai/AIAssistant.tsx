@@ -202,7 +202,7 @@ export function AIAssistant({ className }: AIAssistantProps) {
         onClick={() => setIsOpen(true)}
         className={cn(
           'fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50',
-          'bg-navy-600 hover:bg-navy-700 text-white',
+          'bg-navi-600 hover:bg-navi-700 text-white',
           'hover:scale-105 transition-transform duration-300',
           className
         )}
