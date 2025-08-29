@@ -203,7 +203,6 @@ export function AIAssistant({ className }: AIAssistantProps) {
         className={cn(
           'fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50',
           'bg-emerald-600 hover:bg-emerald-700 text-white',
-          'bg-primary hover:bg-primary/90 text-primary-foreground',
           'hover:scale-105 transition-transform duration-300',
           className
         )}
