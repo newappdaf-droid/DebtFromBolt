@@ -25,7 +25,7 @@ const mockNotifications: Notification[] = [
     message: 'Case #12345 has moved to Legal Stage',
     relatedEntityId: '12345',
     relatedEntityType: 'case',
-    createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(), // 15 minutes ago
+    createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(), // 25 minutes ago
     actionUrl: '/cases/12345',
   },
   {
