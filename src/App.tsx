@@ -21,6 +21,7 @@ import Communications from '@/pages/Communications';
 import NotFound from "./pages/NotFound";
 import Profile from "@/pages/Profile";
 import Settings from "@/pages/Settings";
+import Notifications from "@/pages/Notifications";
 import Register from "@/pages/Register";
 import Onboarding from "@/pages/Onboarding";
 import Users from "@/pages/admin/Users";
@@ -111,6 +112,13 @@ const App = () => (
               <Route path="settings" element={
                 <RoleGuard allowedRoles={['CLIENT', 'AGENT', 'ADMIN', 'DPO']}>
                   <Settings />
+                </RoleGuard>
+              } />
+              
+              {/* Notifications */}
+              <Route path="notifications" element={
+                <RoleGuard allowedRoles={['CLIENT', 'AGENT', 'ADMIN', 'DPO']}>
+                  <Notifications />
                 </RoleGuard>
               } />
               

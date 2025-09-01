@@ -15,40 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Notification, NotificationType } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
-
-// Mock notifications for demo
-const mockNotifications: Notification[] = [
-  {
-    id: '1',
-    type: 'case_update',
-    title: 'Case Status Updated',
-    message: 'Case #12345 has moved to Legal Stage',
-    relatedEntityId: '12345',
-    relatedEntityType: 'case',
-    createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(), // 26 minutes ago
-    actionUrl: '/cases/12345',
-  },
-  {
-    id: '2',
-    type: 'approval_required',
-    title: 'Approval Required',
-    message: 'Legal escalation approval needed for Case #12346',
-    relatedEntityId: '2',
-    relatedEntityType: 'approval',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
-    actionUrl: '/approvals',
-  },
-  {
-    id: '3',
-    type: 'payment_due',
-    title: 'Invoice Overdue',
-    message: 'Invoice #INV-2024-001 is now overdue',
-    relatedEntityId: '1',
-    relatedEntityType: 'invoice',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString(), // 6 hours ago
-    actionUrl: '/invoices/1',
-  },
-];
+import { useNotifications } from '@/hooks/useNotifications';
 
 const notificationIcons: Record<NotificationType, React.ElementType> = {
   case_update: FileText,
@@ -65,33 +32,17 @@ const notificationColors: Record<NotificationType, string> = {
 };
 
 export function NotificationsBell() {
-  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
 
-  const unreadCount = notifications.filter(n => !n.readAt).length;
-
-  const markAsRead = (notificationId: string) => {
-    setNotifications(prev =>
-      prev.map(notification =>
-        notification.id === notificationId
-          ? { ...notification, readAt: new Date().toISOString() }
-          : notification
-      )
-    );
-  };
-
-  const markAllAsRead = () => {
-    const now = new Date().toISOString();
-    setNotifications(prev =>
-      prev.map(notification => ({ ...notification, readAt: now }))
-    );
-  };
 
   const handleNotificationClick = (notification: Notification) => {
     markAsRead(notification.id);
     if (notification.actionUrl) {
+      // Use window.location for navigation to avoid router context issues
       window.location.href = notification.actionUrl;
     }
+    setIsOpen(false);
   };
 
   return (
@@ -195,12 +146,12 @@ export function NotificationsBell() {
                 variant="ghost"
                 size="sm"
                 className="w-full justify-center text-sm"
-                onClick={() => {
-                  window.location.href = '/notifications';
-                  setIsOpen(false);
-                }}
+                onClick={() => setIsOpen(false)}
+                asChild
               >
-                View all notifications
+                <a href="/notifications">
+                  View all notifications
+                </a>
               </Button>
             </div>
           </>
