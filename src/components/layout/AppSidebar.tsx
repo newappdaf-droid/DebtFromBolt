@@ -17,6 +17,7 @@ import {
   Archive,
   MessageSquare,
   User,
+  Bell,
 } from 'lucide-react';
 
 import {
@@ -70,6 +71,12 @@ const navigationItems = [
     title: 'Communications',
     url: '/communications',
     icon: MessageSquare,
+    roles: ['CLIENT', 'AGENT', 'ADMIN', 'DPO'],
+  },
+  {
+    title: 'Notifications',
+    url: '/notifications',
+    icon: Bell,
     roles: ['CLIENT', 'AGENT', 'ADMIN', 'DPO'],
   },
 ];
