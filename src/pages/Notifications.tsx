@@ -4,28 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { format, formatDistanceToNow } from 'date-fns';
-import { 
-  Bell, 
-  CheckCircle, 
-  AlertCircle, 
-  FileText, 
-  CreditCard, 
-  Search, 
-  Filter,
-  MarkAsRead,
-  Trash2,
-  Eye,
-  EyeOff,
-  Calendar,
-  User,
-  Building,
-  Scale,
-  Shield,
-  MessageSquare,
-  ExternalLink,
-  Settings,
-  Download
-} from 'lucide-react';
+import { Bell, CheckCircle, AlertCircle, FileText, CreditCard, Search, Filter, BookMarked as MarkAsRead, Trash2, Eye, EyeOff, Calendar, User, Building, Scale, Shield, MessageSquare, ExternalLink, Settings, Download } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
