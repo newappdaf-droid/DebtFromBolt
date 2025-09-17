@@ -747,7 +747,7 @@ export class UsersApiAdapter {
   }
 
   // Helper method to simulate API delay
-  private async simulateDelay(ms: number = 300): Promise<void> {
+  private async simulateDelay(ms: number = 100): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
