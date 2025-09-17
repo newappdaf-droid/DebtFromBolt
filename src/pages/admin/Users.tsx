@@ -8,7 +8,7 @@ import {
   UserPlus, Mail, Shield, Eye, Key, Clock, Building, Phone, MapPin,
   CheckCircle, XCircle, AlertTriangle, UserCheck, Settings, Archive,
   ChevronDown, ChevronUp, Calendar, Activity, Lock, Unlock, UserX,
-  FileText, BarChart3, TrendingUp, Target, Award, Briefcase
+  FileText, BarChart3, TrendingUp, Target, Award, Briefcase, Save
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -1319,6 +1319,7 @@ export default function Users() {
                 </div>
               </TabsContent>
             </Tabs>
+          )}
           
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowEditDialog(false)}>
