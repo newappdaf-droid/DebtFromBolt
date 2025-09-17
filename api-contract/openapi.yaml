@@ -604,6 +604,277 @@ paths:
               schema:
                 $ref: '#/components/schemas/ImportCasesResponse'
 
+  # User Management
+  /users:
+    get:
+      summary: Get users list with filtering and pagination
+      operationId: getUsers
+      parameters:
+        - name: Query
+          in: query
+          schema:
+            type: string
+          description: Search query for name, email, or department
+        - name: Role
+          in: query
+          schema:
+            $ref: '#/components/schemas/UserRole'
+        - name: Status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, pending, locked]
+        - name: Department
+          in: query
+          schema:
+            type: string
+        - name: ClientId
+          in: query
+          schema:
+            type: string
+        - name: Page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: Size
+          in: query
+          schema:
+            type: integer
+            default: 25
+        - name: SortBy
+          in: query
+          schema:
+            type: string
+            enum: [Name, Email, Role, CreatedAt, LastLoginAt]
+            default: CreatedAt
+        - name: SortOrder
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: Users list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+    post:
+      summary: Create new user
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+
+  /users/{userId}:
+    get:
+      summary: Get user details
+      operationId: getUserDetail
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+    put:
+      summary: Update user
+      operationId: updateUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+    delete:
+      summary: Delete user
+      operationId: deleteUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponse'
+
+  /users/invite:
+    post:
+      summary: Send user invitation
+      operationId: inviteUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InviteUserRequest'
+      responses:
+        '200':
+          description: Invitation sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInvitation'
+
+  /users/bulk-invite:
+    post:
+      summary: Send bulk user invitations
+      operationId: bulkInviteUsers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkInviteRequest'
+      responses:
+        '200':
+          description: Bulk invitations sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkInviteResponse'
+
+  /users/bulk-actions:
+    post:
+      summary: Perform bulk user actions
+      operationId: bulkUserActions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkUserActionRequest'
+      responses:
+        '200':
+          description: Bulk action completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkActionResponse'
+
+  /users/{userId}/reset-password:
+    post:
+      summary: Reset user password
+      operationId: resetUserPassword
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Password reset initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponse'
+
+  /users/{userId}/impersonate:
+    post:
+      summary: Impersonate user (admin only)
+      operationId: impersonateUser
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Reason:
+                  type: string
+                  description: Reason for impersonation
+      responses:
+        '200':
+          description: Impersonation token generated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImpersonationResponse'
+
+  /users/audit-log:
+    get:
+      summary: Get user management audit log
+      operationId: getUserAuditLog
+      parameters:
+        - name: UserId
+          in: query
+          schema:
+            type: string
+        - name: Action
+          in: query
+          schema:
+            type: string
+        - name: DateFrom
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: DateTo
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: Page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: Size
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Audit log entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLogResponse'
+
 components:
   schemas:
     # Enums
@@ -1263,6 +1534,334 @@ components:
         UpdatedAt:
           type: string
           format: date-time
+
+    # User Management Schemas
+    UserRole:
+      type: string
+      enum: [CLIENT, AGENT, ADMIN, DPO]
+
+    UserStatus:
+      type: string
+      enum: [active, inactive, pending, locked]
+
+    UserSummary:
+      type: object
+      required: [UserId, Email, Name, Role, Status, CreatedAt]
+      properties:
+        UserId:
+          type: string
+        Email:
+          type: string
+          format: email
+        Name:
+          type: string
+        Role:
+          $ref: '#/components/schemas/UserRole'
+        Status:
+          $ref: '#/components/schemas/UserStatus'
+        Department:
+          type: string
+          nullable: true
+        ClientId:
+          type: string
+          nullable: true
+        LastLoginAt:
+          type: string
+          format: date-time
+          nullable: true
+        CreatedAt:
+          type: string
+          format: date-time
+        IsActive:
+          type: boolean
+
+    UserDetail:
+      allOf:
+        - $ref: '#/components/schemas/UserSummary'
+        - type: object
+          properties:
+            Phone:
+              type: string
+              nullable: true
+            JobTitle:
+              type: string
+              nullable: true
+            Permissions:
+              type: array
+              items:
+                type: string
+            LastLoginIp:
+              type: string
+              nullable: true
+            FailedLoginAttempts:
+              type: integer
+              default: 0
+            LockedUntil:
+              type: string
+              format: date-time
+              nullable: true
+            PasswordChangedAt:
+              type: string
+              format: date-time
+              nullable: true
+            UpdatedAt:
+              type: string
+              format: date-time
+            UpdatedBy:
+              type: string
+              nullable: true
+
+    CreateUserRequest:
+      type: object
+      required: [Email, Name, Role]
+      properties:
+        Email:
+          type: string
+          format: email
+        Name:
+          type: string
+        Role:
+          $ref: '#/components/schemas/UserRole'
+        Department:
+          type: string
+          nullable: true
+        Phone:
+          type: string
+          nullable: true
+        JobTitle:
+          type: string
+          nullable: true
+        ClientId:
+          type: string
+          nullable: true
+        IsActive:
+          type: boolean
+          default: true
+        SendInvitation:
+          type: boolean
+          default: true
+        Permissions:
+          type: array
+          items:
+            type: string
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        Name:
+          type: string
+        Role:
+          $ref: '#/components/schemas/UserRole'
+        Department:
+          type: string
+          nullable: true
+        Phone:
+          type: string
+          nullable: true
+        JobTitle:
+          type: string
+          nullable: true
+        ClientId:
+          type: string
+          nullable: true
+        IsActive:
+          type: boolean
+        Permissions:
+          type: array
+          items:
+            type: string
+
+    InviteUserRequest:
+      type: object
+      required: [Email, Name, Role]
+      properties:
+        Email:
+          type: string
+          format: email
+        Name:
+          type: string
+        Role:
+          $ref: '#/components/schemas/UserRole'
+        Department:
+          type: string
+          nullable: true
+        ClientId:
+          type: string
+          nullable: true
+        CustomMessage:
+          type: string
+          nullable: true
+
+    BulkInviteRequest:
+      type: object
+      required: [Invitations]
+      properties:
+        Invitations:
+          type: array
+          items:
+            $ref: '#/components/schemas/InviteUserRequest'
+
+    BulkInviteResponse:
+      type: object
+      required: [TotalInvitations, SuccessfulInvitations, FailedInvitations]
+      properties:
+        TotalInvitations:
+          type: integer
+        SuccessfulInvitations:
+          type: integer
+        FailedInvitations:
+          type: integer
+        FailedEmails:
+          type: array
+          items:
+            type: string
+        Errors:
+          type: array
+          items:
+            type: string
+
+    BulkUserActionRequest:
+      type: object
+      required: [UserIds, Action]
+      properties:
+        UserIds:
+          type: array
+          items:
+            type: string
+        Action:
+          type: string
+          enum: [activate, deactivate, assign_role, reset_password, delete]
+        ActionData:
+          type: object
+          nullable: true
+          description: Additional data for the action (e.g., role for assign_role)
+
+    BulkActionResponse:
+      type: object
+      required: [TotalUsers, SuccessfulActions, FailedActions]
+      properties:
+        TotalUsers:
+          type: integer
+        SuccessfulActions:
+          type: integer
+        FailedActions:
+          type: integer
+        FailedUserIds:
+          type: array
+          items:
+            type: string
+        Errors:
+          type: array
+          items:
+            type: string
+
+    UserInvitation:
+      type: object
+      required: [InvitationId, Email, Status, CreatedAt]
+      properties:
+        InvitationId:
+          type: string
+        Email:
+          type: string
+          format: email
+        Name:
+          type: string
+        Role:
+          $ref: '#/components/schemas/UserRole'
+        Status:
+          type: string
+          enum: [pending, accepted, expired, cancelled]
+        InvitationToken:
+          type: string
+        ExpiresAt:
+          type: string
+          format: date-time
+        CreatedAt:
+          type: string
+          format: date-time
+        AcceptedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    ImpersonationResponse:
+      type: object
+      required: [ImpersonationToken, ExpiresAt]
+      properties:
+        ImpersonationToken:
+          type: string
+        ExpiresAt:
+          type: string
+          format: date-time
+        TargetUser:
+          $ref: '#/components/schemas/UserSummary'
+
+    UserListResponse:
+      type: object
+      required: [Users, Total, Page, Size]
+      properties:
+        Users:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserSummary'
+        Total:
+          type: integer
+        Page:
+          type: integer
+        Size:
+          type: integer
+        HasNext:
+          type: boolean
+        HasPrevious:
+          type: boolean
+
+    AuditLogEntry:
+      type: object
+      required: [AuditId, UserId, Action, Timestamp, PerformedBy]
+      properties:
+        AuditId:
+          type: string
+        UserId:
+          type: string
+        UserEmail:
+          type: string
+        Action:
+          type: string
+        Details:
+          type: string
+          nullable: true
+        IpAddress:
+          type: string
+          nullable: true
+        UserAgent:
+          type: string
+          nullable: true
+        Timestamp:
+          type: string
+          format: date-time
+        PerformedBy:
+          type: string
+        PerformedByName:
+          type: string
+
+    AuditLogResponse:
+      type: object
+      required: [Entries, Total, Page, Size]
+      properties:
+        Entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditLogEntry'
+        Total:
+          type: integer
+        Page:
+          type: integer
+        Size:
+          type: integer
+        HasNext:
+          type: boolean
+        HasPrevious:
+          type: boolean
 
   securitySchemes:
     BearerAuth:
