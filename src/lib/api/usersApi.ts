@@ -167,7 +167,7 @@ class MockUsersDataStore {
     const departments = ["Finance", "Collections", "Legal", "IT", "Management", "Data Protection"];
     const jobTitles = ["Manager", "Specialist", "Senior Agent", "Junior Agent", "Director", "Officer"];
     
-    for (let i = 1; i <= 50; i++) {
+    for (let i = 1; i <= 25; i++) {
       const roles: UserRole[] = ["CLIENT", "AGENT", "ADMIN", "DPO"];
       const statuses: UserStatus[] = ["active", "inactive", "pending"];
       
@@ -205,7 +205,7 @@ class MockUsersDataStore {
     }
 
     // Generate mock invitations
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 5; i++) {
       const invitation: UserInvitation = {
         InvitationId: `inv_${i}`,
         Email: `newuser${i}@example.com`,
@@ -221,11 +221,11 @@ class MockUsersDataStore {
 
     // Generate mock audit log
     const actions = ["user_created", "user_updated", "user_deleted", "role_changed", "password_reset", "user_activated", "user_deactivated"];
-    for (let i = 1; i <= 100; i++) {
+    for (let i = 1; i <= 50; i++) {
       const auditEntry: AuditLogEntry = {
         AuditId: `audit_${i}`,
-        UserId: `user_${Math.floor(Math.random() * 50) + 1}`,
-        UserEmail: `user${Math.floor(Math.random() * 50) + 1}@example.com`,
+        UserId: `user_${Math.floor(Math.random() * 25) + 1}`,
+        UserEmail: `user${Math.floor(Math.random() * 25) + 1}@example.com`,
         Action: actions[Math.floor(Math.random() * actions.length)],
         Details: `Mock audit entry ${i}`,
         IpAddress: `192.168.1.${Math.floor(Math.random() * 254) + 1}`,
