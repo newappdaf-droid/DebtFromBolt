@@ -243,7 +243,6 @@ export default function Users() {
     setShowUserDialog(true);
   };
 
-  const handleEditUser = (user: User) => {
   const handleEditUser = (user: UserType) => {
     setSelectedUser(user);
     setIsEditing(true);
@@ -361,7 +360,6 @@ export default function Users() {
     }
   };
 
-  const getUserInitials = (user: User) => {
   const getUserInitials = (user: UserType) => {
     return user.name
       .split(' ')
