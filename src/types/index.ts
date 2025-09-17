@@ -3,46 +3,6 @@
 
 export type UserRole = 'CLIENT' | 'AGENT' | 'ADMIN' | 'DPO';
 
-export type UserStatus = 'ACTIVE' | 'PENDING_VERIFICATION' | 'DISABLED' | 'DELETED_SOFT';
-
-export type MfaMethod = 'TOTP' | 'WebAuthn' | 'SMS';
-
-export type UserSource = 'signup' | 'invitation' | 'sso' | 'admin_created';
-
-export interface NotificationPrefs {
-  email: boolean;
-  push: boolean;
-  in_app: boolean;
-  sms?: boolean;
-}
-
-export interface ExternalIdentity {
-  provider: 'google' | 'azuread' | 'apple' | 'okta' | 'saml';
-  subject: string;
-  email?: string;
-  verified?: boolean;
-  linked_at: string;
-}
-
-export interface SecuritySettings {
-  mfa_enabled: boolean;
-  mfa_methods: MfaMethod[];
-  failed_login_count: number;
-  last_login_at?: string;
-  locked_until?: string;
-  recovery_email?: string;
-  recovery_codes?: string[];
-}
-
-export interface ComplianceData {
-  accepted_terms_at?: string;
-  privacy_consent_at?: string;
-  terms_version?: string;
-  privacy_version?: string;
-  marketing_opt_in: boolean;
-  gdpr_erasure_at?: string;
-}
-
 export type CaseStatus = 'new' | 'in_progress' | 'awaiting_approval' | 'legal_stage' | 'closed';
 
 export type ApprovalType = 'expense' | 'legal_escalation' | 'retrieval' | 'settlement_approval' | 'payment_plan' | 'write_off';
@@ -60,52 +20,18 @@ export type ConversationType = 'case' | 'general';
 export type MessageType = 'text' | 'system' | 'file';
 
 export interface User {
-  // Core (must-have)
   id: string;
   email: string;
-  email_verified: boolean;
-  password_hash?: string; // Only for admin views, never exposed to frontend normally
-  password_version?: string;
-  status: UserStatus;
-  
-  // Identity & profile
   name: string;
-  username?: string;
   role: UserRole;
-  phone?: string;
-  phone_verified: boolean;
-  avatar_url?: string;
-  
-  // Legacy fields (keeping for backward compatibility)
   clientId?: string; // Only for CLIENT role
   department?: string;
+  phone?: string;
   isActive?: boolean;
   permissions?: string[];
-  
-  // Locale & preferences
-  locale: string;
-  timezone: string;
-  notification_prefs: NotificationPrefs;
-  marketing_opt_in: boolean;
-  
-  // Security & compliance
-  security: SecuritySettings;
-  compliance: ComplianceData;
-  
-  // Integrations & SSO
-  external_identities: ExternalIdentity[];
-  tenant_id?: string;
-  groups: string[];
-  
-  // Lifecycle management
-  source: UserSource;
-  deactivated_at?: string;
-  
-  // Audit fields
   createdAt: string;
   updatedAt?: string;
-  created_by?: string;
-  updated_by?: string;
+  lastLoginAt?: string;
 }
 
 export interface AuthTokens {
