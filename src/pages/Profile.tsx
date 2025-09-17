@@ -22,6 +22,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { User as UserType } from '@/types';
 
 const profileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -80,14 +81,14 @@ export default function Profile() {
   };
 
   const getUserInitials = () => {
-    return user?.name
+    return (user as UserType)?.name
       ?.split(' ')
       .map(n => n.charAt(0))
       .join('')
       .toUpperCase() || 'U';
   };
 
-  const getRoleBadgeVariant = (role: string) => {
+  const getRoleBadgeVariant = (role: UserType['role']) => {
     switch (role) {
       case 'ADMIN':
         return 'destructive';
@@ -102,7 +103,7 @@ export default function Profile() {
     }
   };
 
-  const getStatusBadgeVariant = (status: string) => {
+  const getStatusBadgeVariant = (status: UserType['status']) => {
     switch (status) {
       case 'ACTIVE':
         return 'default';
@@ -117,7 +118,7 @@ export default function Profile() {
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: UserType['status']) => {
     switch (status) {
       case 'ACTIVE':
         return CheckCircle;

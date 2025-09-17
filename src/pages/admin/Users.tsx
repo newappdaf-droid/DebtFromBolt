@@ -55,7 +55,7 @@ import * as z from 'zod';
 import { toast } from '@/hooks/use-toast';
 
 import { usersApi } from '@/lib/api/usersApi';
-import { User, UserRole, UserStatus, UserSource, NotificationPrefs } from '@/types';
+import { User as UserType, UserRole, UserStatus, UserSource, NotificationPrefs } from '@/types';
 
 // Comprehensive user form schema
 const userFormSchema = z.object({
@@ -143,9 +143,9 @@ const sourceConfig = {
 };
 
 export default function Users() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [users, setUsers] = useState<UserType[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<UserType[]>([]);
+  const [selectedUser, setSelectedUser] = useState<UserType | null>(null);
   const [showUserDialog, setShowUserDialog] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -244,6 +244,7 @@ export default function Users() {
   };
 
   const handleEditUser = (user: User) => {
+  const handleEditUser = (user: UserType) => {
     setSelectedUser(user);
     setIsEditing(true);
     
@@ -279,7 +280,7 @@ export default function Users() {
       setLoading(true);
       
       // Transform form data to User object
-      const userData: Partial<User> = {
+      const userData: Partial<UserType> = {
         email: data.email.toLowerCase().trim(),
         email_verified: data.email_verified,
         status: data.status,
@@ -361,6 +362,7 @@ export default function Users() {
   };
 
   const getUserInitials = (user: User) => {
+  const getUserInitials = (user: UserType) => {
     return user.name
       .split(' ')
       .map(n => n.charAt(0))
