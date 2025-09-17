@@ -588,7 +588,7 @@ export default function Users() {
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <Avatar className="h-10 w-10">
-                            <AvatarImage src={user.avatar_url} />
+                            <AvatarImage src={user.avatar_url || ''} />
                             <AvatarFallback>{getUserInitials(user)}</AvatarFallback>
                           </Avatar>
                           <div>
