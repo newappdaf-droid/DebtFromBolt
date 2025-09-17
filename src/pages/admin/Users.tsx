@@ -225,7 +225,7 @@ export default function Users() {
       filtered = filtered.filter(user => 
         user.name.toLowerCase().includes(query) ||
         user.email.toLowerCase().includes(query) ||
-        (user.username && typeof user.username === 'string' && user.username.toLowerCase().includes(query)) ||
+        (user.username && user.username.toLowerCase().includes(query)) ||
         (user.department && user.department.toLowerCase().includes(query))
       );
     }
@@ -361,7 +361,7 @@ export default function Users() {
   };
 
   const getUserInitials = (user: UserType) => {
-    return (user.name || 'U')
+    return user.name
       .split(' ')
       .map(n => n.charAt(0))
       .join('')
@@ -377,7 +377,7 @@ export default function Users() {
         user.email,
         user.role,
         user.status,
-        `"${user.department || 'N/A'}"`,
+        `"${user.department || ''}"`,
         new Date(user.createdAt).toLocaleDateString('en-GB'),
         user.security.last_login_at ? new Date(user.security.last_login_at).toLocaleDateString('en-GB') : 'Never'
       ].join(','))
@@ -594,7 +594,7 @@ export default function Users() {
                           <div>
                             <div className="flex items-center gap-2">
                               <p className="font-medium">{user.name}</p>
-                              {user.username && user.username.trim() && (
+                              {user.username && (
                                 <Badge variant="outline" className="text-xs">
                                   @{user.username}
                                 </Badge>
@@ -602,7 +602,7 @@ export default function Users() {
                             </div>
                             <p className="text-sm text-muted-foreground">{user.email}</p>
                             {user.department && (
-                              <p className="text-xs text-muted-foreground">{user.department.trim()}</p>
+                              <p className="text-xs text-muted-foreground">{user.department}</p>
                             )}
                           </div>
                         </div>
