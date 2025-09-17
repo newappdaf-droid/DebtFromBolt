@@ -743,7 +743,7 @@ export default function Users() {
                       <FormItem>
                         <FormLabel>Full Name *</FormLabel>
                         <FormControl>
-                          <Input placeholder="John Doe" {...field} />
+                          <Input placeholder="John Doe" {...field} value={field.value || ''} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -757,7 +757,7 @@ export default function Users() {
                       <FormItem>
                         <FormLabel>Username</FormLabel>
                         <FormControl>
-                          <Input placeholder="johndoe" {...field} />
+                          <Input placeholder="johndoe" {...field} value={field.value || ''} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -771,7 +771,7 @@ export default function Users() {
                       <FormItem>
                         <FormLabel>Email Address *</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="john.doe@example.com" {...field} />
+                          <Input type="email" placeholder="john.doe@example.com" {...field} value={field.value || ''} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -785,7 +785,7 @@ export default function Users() {
                       <FormItem>
                         <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                          <Input placeholder="+44 20 7123 4567" {...field} />
+                          <Input placeholder="+44 20 7123 4567" {...field} value={field.value || ''} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -798,7 +798,7 @@ export default function Users() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Role *</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value || ''}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select role" />
@@ -822,7 +822,7 @@ export default function Users() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Account Status</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value || ''}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select status" />
@@ -849,7 +849,7 @@ export default function Users() {
                       <FormItem>
                         <FormLabel>Department</FormLabel>
                         <FormControl>
-                          <Input placeholder="Finance, Collections, etc." {...field} />
+                          <Input placeholder="Finance, Collections, etc." {...field} value={field.value || ''} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -863,7 +863,7 @@ export default function Users() {
                       <FormItem>
                         <FormLabel>Avatar URL</FormLabel>
                         <FormControl>
-                          <Input placeholder="https://example.com/avatar.jpg" {...field} />
+                          <Input placeholder="https://example.com/avatar.jpg" {...field} value={field.value || ''} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -892,7 +892,7 @@ export default function Users() {
                         </div>
                         <FormControl>
                           <Switch
-                            checked={field.value}
+                            checked={field.value || false}
                             onCheckedChange={field.onChange}
                           />
                         </FormControl>
@@ -913,7 +913,7 @@ export default function Users() {
                         </div>
                         <FormControl>
                           <Switch
-                            checked={field.value}
+                            checked={field.value || false}
                             onCheckedChange={field.onChange}
                           />
                         </FormControl>
@@ -936,7 +936,7 @@ export default function Users() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Language & Region</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value || ''}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select locale" />
@@ -962,7 +962,7 @@ export default function Users() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Timezone</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value || ''}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select timezone" />
@@ -993,7 +993,7 @@ export default function Users() {
                         <FormItem className="flex flex-row items-center justify-between">
                           <FormLabel>Email Notifications</FormLabel>
                           <FormControl>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            <Switch checked={field.value || false} onCheckedChange={field.onChange} />
                           </FormControl>
                         </FormItem>
                       )}
@@ -1005,7 +1005,7 @@ export default function Users() {
                         <FormItem className="flex flex-row items-center justify-between">
                           <FormLabel>Push Notifications</FormLabel>
                           <FormControl>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            <Switch checked={field.value || false} onCheckedChange={field.onChange} />
                           </FormControl>
                         </FormItem>
                       )}
@@ -1017,7 +1017,7 @@ export default function Users() {
                         <FormItem className="flex flex-row items-center justify-between">
                           <FormLabel>In-App Notifications</FormLabel>
                           <FormControl>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            <Switch checked={field.value || false} onCheckedChange={field.onChange} />
                           </FormControl>
                         </FormItem>
                       )}
@@ -1029,7 +1029,7 @@ export default function Users() {
                         <FormItem className="flex flex-row items-center justify-between">
                           <FormLabel>SMS Notifications</FormLabel>
                           <FormControl>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            <Switch checked={field.value || false} onCheckedChange={field.onChange} />
                           </FormControl>
                         </FormItem>
                       )}
@@ -1050,7 +1050,7 @@ export default function Users() {
                       </div>
                       <FormControl>
                         <Switch
-                          checked={field.value}
+                          checked={field.value || false}
                           onCheckedChange={field.onChange}
                         />
                       </FormControl>
@@ -1079,7 +1079,7 @@ export default function Users() {
                         </div>
                         <FormControl>
                           <Switch
-                            checked={field.value}
+                            checked={field.value || false}
                             onCheckedChange={field.onChange}
                           />
                         </FormControl>
@@ -1094,7 +1094,7 @@ export default function Users() {
                       <FormItem>
                         <FormLabel>Recovery Email</FormLabel>
                         <FormControl>
-                          <Input type="email" placeholder="recovery@example.com" {...field} />
+                          <Input type="email" placeholder="recovery@example.com" {...field} value={field.value || ''} />
                         </FormControl>
                         <FormDescription>
                           Alternative email for account recovery
@@ -1119,7 +1119,7 @@ export default function Users() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Account Source</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value || ''}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select source" />
@@ -1144,7 +1144,7 @@ export default function Users() {
                       <FormItem>
                         <FormLabel>Tenant ID</FormLabel>
                         <FormControl>
-                          <Input placeholder="tenant_123" {...field} />
+                          <Input placeholder="tenant_123" {...field} value={field.value || ''} />
                         </FormControl>
                         <FormDescription>
                           For multi-tenant environments
