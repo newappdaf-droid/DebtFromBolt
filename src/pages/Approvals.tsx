@@ -1,5 +1,5 @@
 // Professional Approvals Management Page for B2B Debt Collection Platform
-// Complete approval workflow with role-based access and decision tracking
+// Redesigned to match reference layout with clean table and detailed approval modal
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -20,7 +20,9 @@ import {
   Calculator,
   Calendar,
   User,
-  Building
+  Building,
+  Download,
+  Scale
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -48,6 +50,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from '@/hooks/use-toast';
+import { Money } from '@/components/ui/money';
 
 import { useAuth } from '@/components/auth/AuthProvider';
 import { getApprovalsForUser } from '@/lib/mockData';
@@ -56,42 +59,252 @@ import type { Approval } from '@/types';
 
 const statusConfig = {
   pending: { 
-    label: 'Pending Review', 
+    label: 'Pending', 
     icon: Clock, 
     variant: 'warning' as const,
-    description: 'Awaiting decision'
+    description: 'Awaiting decision',
+    color: 'bg-yellow-100 text-yellow-800'
   },
   approved: { 
     label: 'Approved', 
     icon: CheckCircle, 
     variant: 'success' as const,
-    description: 'Request approved'
+    description: 'Request approved',
+    color: 'bg-green-100 text-green-800'
   },
   rejected: { 
     label: 'Rejected', 
     icon: XCircle, 
     variant: 'destructive' as const,
-    description: 'Request declined'
+    description: 'Request declined',
+    color: 'bg-red-100 text-red-800'
   }
 };
 
 const typeConfig = {
   legal_escalation: {
     label: 'Legal Escalation',
-    icon: AlertTriangle,
-    description: 'Request to escalate case to legal proceedings'
+    icon: Scale,
+    description: 'Request to escalate case to legal proceedings',
+    color: 'bg-red-100 text-red-800'
   },
   expense: {
     label: 'Expense Approval',
     icon: Calculator,
-    description: 'Request for expense reimbursement'
+    description: 'Request for expense reimbursement',
+    color: 'bg-blue-100 text-blue-800'
   },
-  settlement: {
+  settlement_approval: {
     label: 'Settlement Agreement',
     icon: FileText,
-    description: 'Proposed settlement terms'
+    description: 'Proposed settlement terms',
+    color: 'bg-green-100 text-green-800'
+  },
+  payment_plan: {
+    label: 'Payment Plan',
+    icon: Calendar,
+    description: 'Payment plan approval',
+    color: 'bg-purple-100 text-purple-800'
+  },
+  retrieval: {
+    label: 'Case Retrieval',
+    icon: FileText,
+    description: 'Case retrieval request',
+    color: 'bg-orange-100 text-orange-800'
+  },
+  write_off: {
+    label: 'Write Off',
+    icon: X,
+    description: 'Write off approval',
+    color: 'bg-gray-100 text-gray-800'
   }
 };
+
+// Approval Detail Modal Component
+interface ApprovalDetailModalProps {
+  approval: Approval;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  onDecision: (approvalId: string, decision: 'approved' | 'rejected', comments?: string) => void;
+}
+
+function ApprovalDetailModal({ approval, isOpen, onOpenChange, onDecision }: ApprovalDetailModalProps) {
+  const [comments, setComments] = useState('');
+  const [selectedDecision, setSelectedDecision] = useState<'approved' | 'rejected' | null>(null);
+  const { user } = useAuth();
+
+  const handleDecision = (decision: 'approved' | 'rejected') => {
+    setSelectedDecision(decision);
+  };
+
+  const handleConfirmDecision = () => {
+    if (selectedDecision) {
+      onDecision(approval.id, selectedDecision, comments);
+      setComments('');
+      setSelectedDecision(null);
+      onOpenChange(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setComments('');
+    setSelectedDecision(null);
+    onOpenChange(false);
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Scale className="h-5 w-5 text-primary" />
+            {typeConfig[approval.type as keyof typeof typeConfig]?.label || approval.type} Approval Required
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-6">
+          {/* Case Details */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-lg">Case Details</h4>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-muted-foreground">Case:</span>
+                <p className="font-medium">{approval.caseName}</p>
+              </div>
+              <div className="text-right">
+                <span className="text-muted-foreground">Amount:</span>
+                <p className="font-medium">
+                  <Money amount={approval.amount || 0} currency={approval.currency || 'EUR'} />
+                </p>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Requested by:</span>
+                <p className="font-medium">{approval.requestedByName}</p>
+              </div>
+              <div className="text-right">
+                <span className="text-muted-foreground">Request date:</span>
+                <p className="font-medium">{format(new Date(approval.createdAt), 'dd/MM/yyyy')}</p>
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Description */}
+          <div>
+            <p className="text-sm text-muted-foreground mb-2">
+              {approval.description}
+            </p>
+          </div>
+
+          {/* Relevant Contract Clause */}
+          {approval.clauseText && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <FileText className="h-4 w-4 text-blue-600" />
+                <h4 className="font-medium text-blue-900">Relevant Contract Clause</h4>
+              </div>
+              <p className="text-sm text-blue-800">{approval.clauseText}</p>
+            </div>
+          )}
+
+          {/* Fee Breakdown */}
+          {approval.feeBreakdown && (
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h4 className="font-semibold mb-3">Fee Breakdown</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Handling Fee:</span>
+                  <span><Money amount={approval.feeBreakdown.baseAmount * approval.feeBreakdown.percentage / 100} currency={approval.feeBreakdown.currency} /></span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Legal Fee:</span>
+                  <span><Money amount={approval.feeBreakdown.fixedFee} currency={approval.feeBreakdown.currency} /></span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Additional Costs:</span>
+                  <span><Money amount={250} currency={approval.feeBreakdown.currency} /></span>
+                </div>
+                <Separator />
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Subtotal:</span>
+                  <span><Money amount={approval.feeBreakdown.totalFee - approval.feeBreakdown.vatAmount} currency={approval.feeBreakdown.currency} /></span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">VAT (20%):</span>
+                  <span><Money amount={approval.feeBreakdown.vatAmount} currency={approval.feeBreakdown.currency} /></span>
+                </div>
+                <Separator />
+                <div className="flex justify-between font-bold text-lg">
+                  <span>Total:</span>
+                  <span><Money amount={approval.feeBreakdown.totalFee} currency={approval.feeBreakdown.currency} /></span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Warning Notice */}
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5" />
+              <p className="text-sm text-yellow-800">
+                Legal escalation will incur additional fees and may impact the timeline significantly.
+              </p>
+            </div>
+          </div>
+
+          {/* Comments */}
+          <div>
+            <label className="block text-sm font-medium mb-2">Comments (Optional)</label>
+            <Textarea
+              value={comments}
+              onChange={(e) => setComments(e.target.value)}
+              placeholder="Add any comments or notes about your decision..."
+              rows={3}
+              className="w-full"
+            />
+          </div>
+
+          {/* Decision Buttons */}
+          {approval.state === 'pending' && user?.role === 'ADMIN' && (
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1 border-green-500 text-green-700 hover:bg-green-50"
+                onClick={() => handleDecision('approved')}
+              >
+                <Check className="h-4 w-4 mr-2" />
+                Approve
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1 border-red-500 text-red-700 hover:bg-red-50"
+                onClick={() => handleDecision('rejected')}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Reject
+              </Button>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={handleCancel}>
+            Cancel
+          </Button>
+          {selectedDecision && (
+            <Button 
+              onClick={handleConfirmDecision}
+              variant={selectedDecision === 'approved' ? 'default' : 'destructive'}
+            >
+              Confirm Decision
+            </Button>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export default function Approvals() {
   const navigate = useNavigate();
@@ -101,9 +314,7 @@ export default function Approvals() {
   const [approvals, setApprovals] = useState<Approval[]>([]);
   const [filteredApprovals, setFilteredApprovals] = useState<Approval[]>([]);
   const [selectedApproval, setSelectedApproval] = useState<Approval | null>(null);
-  const [showDecisionDialog, setShowDecisionDialog] = useState(false);
-  const [decisionType, setDecisionType] = useState<'approve' | 'reject'>('approve');
-  const [decisionNotes, setDecisionNotes] = useState('');
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [loading, setLoading] = useState(false);
   
   // Filters
@@ -146,7 +357,12 @@ export default function Approvals() {
     setFilteredApprovals(filtered);
   }, [approvals, statusFilter, typeFilter, searchQuery]);
 
-  const handleDecision = async (approval: Approval, decision: 'approve' | 'reject') => {
+  const handleReviewApproval = (approval: Approval) => {
+    setSelectedApproval(approval);
+    setShowApprovalModal(true);
+  };
+
+  const handleApprovalDecision = async (approvalId: string, decision: 'approved' | 'rejected', comments?: string) => {
     if (user?.role !== 'ADMIN') {
       toast({
         title: 'Unauthorized',
@@ -156,15 +372,6 @@ export default function Approvals() {
       return;
     }
 
-    setSelectedApproval(approval);
-    setDecisionType(decision);
-    setDecisionNotes('');
-    setShowDecisionDialog(true);
-  };
-
-  const handleSubmitDecision = async () => {
-    if (!selectedApproval) return;
-
     setLoading(true);
     
     try {
@@ -173,23 +380,22 @@ export default function Approvals() {
       
       // Update local state
       const updatedApprovals = approvals.map(approval => 
-        approval.id === selectedApproval.id 
+        approval.id === approvalId 
           ? {
               ...approval,
-              state: decisionType === 'approve' ? 'approved' : 'rejected' as any,
+              state: decision === 'approved' ? 'approved' : 'rejected' as any,
               decidedAt: new Date().toISOString(),
               decidedBy: user?.id,
-              decisionNotes: decisionNotes || undefined
+              decisionNotes: comments || undefined
             }
           : approval
       );
       
       setApprovals(updatedApprovals);
-      setShowDecisionDialog(false);
       
       toast({
-        title: `Request ${decisionType === 'approve' ? 'Approved' : 'Rejected'}`,
-        description: `${selectedApproval.caseName} has been ${decisionType === 'approve' ? 'approved' : 'rejected'}.`
+        title: `Request ${decision === 'approved' ? 'Approved' : 'Rejected'}`,
+        description: `The approval request has been ${decision}.`
       });
       
     } catch (error) {
@@ -215,18 +421,23 @@ export default function Approvals() {
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Approvals Management</h1>
+          <h1 className="text-3xl font-bold">Approvals</h1>
           <p className="text-muted-foreground">
-            {user?.role === 'ADMIN' ? 'Review and approve requests' : 'Track your approval requests'}
+            Review and approve case-related requests
           </p>
         </div>
         
-        {stats.pending > 0 && user?.role === 'ADMIN' && (
-          <Badge variant="outline" className="text-sm py-2 px-4 border-warning text-warning">
-            {stats.pending} Pending Review{stats.pending > 1 ? 's' : ''}
-            <AIHelpButton onOpenAI={() => {}} className="ml-2" />
-          </Badge>
-        )}
+        <div className="flex gap-2">
+          <Button variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
+          </Button>
+          {stats.pending > 0 && user?.role === 'ADMIN' && (
+            <Badge variant="outline" className="text-sm py-2 px-4 border-warning text-warning">
+              {stats.pending} Pending Review{stats.pending > 1 ? 's' : ''}
+            </Badge>
+          )}
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -325,7 +536,10 @@ export default function Approvals() {
                   <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="legal_escalation">Legal Escalation</SelectItem>
                   <SelectItem value="expense">Expense Approval</SelectItem>
-                  <SelectItem value="settlement">Settlement</SelectItem>
+                  <SelectItem value="settlement_approval">Settlement</SelectItem>
+                  <SelectItem value="payment_plan">Payment Plan</SelectItem>
+                  <SelectItem value="retrieval">Retrieval</SelectItem>
+                  <SelectItem value="write_off">Write Off</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -333,11 +547,11 @@ export default function Approvals() {
         </CardContent>
       </Card>
 
-      {/* Approvals List */}
-      <div className="grid gap-6">
-        {filteredApprovals.length === 0 ? (
-          <Card className="card-professional">
-            <CardContent className="py-12 text-center">
+      {/* Approvals Table */}
+      <Card className="card-professional">
+        <CardContent className="p-0">
+          {filteredApprovals.length === 0 ? (
+            <div className="py-12 text-center">
               <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <h3 className="text-lg font-medium mb-2">No approval requests found</h3>
               <p className="text-muted-foreground">
@@ -346,175 +560,96 @@ export default function Approvals() {
                   : 'Approval requests will appear here when submitted.'
                 }
               </p>
-            </CardContent>
-          </Card>
-        ) : (
-          filteredApprovals.map((approval) => {
-            const StatusIcon = statusConfig[approval.state].icon;
-            const TypeIcon = typeConfig[approval.type as keyof typeof typeConfig]?.icon || FileText;
-            
-            return (
-              <Card key={approval.id} className="card-professional hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 bg-primary/10 rounded-lg">
-                      <TypeIcon className="h-6 w-6 text-primary" />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4 mb-3">
-                        <div>
-                          <h3 className="font-semibold text-lg mb-1">{approval.caseName}</h3>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {typeConfig[approval.type as keyof typeof typeConfig]?.label || approval.type}
-                          </p>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <StatusBadge status={approval.state} />
-                        </div>
-                      </div>
-                      
-                      <p className="text-sm mb-4 line-clamp-2">{approval.description}</p>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div className="flex items-center gap-2 text-sm">
-                          <User className="h-4 w-4 text-muted-foreground" />
-                          <span>Requested by {approval.requestedByName}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span>{format(new Date(approval.createdAt), 'MMM dd, yyyy')}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Calculator className="h-4 w-4 text-muted-foreground" />
-                          <span>£{approval.amount.toLocaleString()}</span>
-                        </div>
-                      </div>
-                      
-                      {approval.feeBreakdown && (
-                        <div className="bg-accent/50 rounded-lg p-3 mb-4">
-                          <h4 className="font-medium text-sm mb-2">Fee Breakdown</h4>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                            <div>
-                              <span className="text-muted-foreground">Base:</span>
-                              <span className="ml-2">£{approval.feeBreakdown.baseAmount.toLocaleString()}</span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Fee ({approval.feeBreakdown.percentage}%):</span>
-                              <span className="ml-2">£{(approval.feeBreakdown.baseAmount * approval.feeBreakdown.percentage / 100).toLocaleString()}</span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Fixed:</span>
-                              <span className="ml-2">£{approval.feeBreakdown.fixedFee.toLocaleString()}</span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground font-medium">Total:</span>
-                              <span className="ml-2 font-medium">£{approval.feeBreakdown.totalFee.toLocaleString()}</span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      
-                      <div className="flex items-center justify-between">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => navigate(`/cases/${approval.caseId}`)}
-                        >
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Case
-                        </Button>
-                        
-                        {approval.state === 'pending' && user?.role === 'ADMIN' && (
-                          <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDecision(approval, 'reject')}
-                            >
-                              <X className="h-4 w-4 mr-2" />
-                              Reject
-                            </Button>
-                            <Button
-                              size="sm"
-                              onClick={() => handleDecision(approval, 'approve')}
-                            >
-                              <Check className="h-4 w-4 mr-2" />
-                              Approve
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                      
-                      {approval.decisionNotes && (
-                        <div className="mt-4 p-3 bg-accent/30 rounded-lg border-l-4 border-l-primary">
-                          <p className="text-sm font-medium mb-1">Decision Notes:</p>
-                          <p className="text-sm text-muted-foreground">{approval.decisionNotes}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })
-        )}
-      </div>
-
-      {/* Decision Dialog */}
-      <Dialog open={showDecisionDialog} onOpenChange={setShowDecisionDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {decisionType === 'approve' ? 'Approve Request' : 'Reject Request'}
-            </DialogTitle>
-            <DialogDescription>
-              {selectedApproval && (
-                <>
-                  You are about to {decisionType} the request for{' '}
-                  <span className="font-medium">{selectedApproval.caseName}</span>.
-                </>
-              )}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block">
-                Decision Notes {decisionType === 'reject' ? '(Required)' : '(Optional)'}
-              </label>
-              <Textarea
-                placeholder={
-                  decisionType === 'approve' 
-                    ? 'Add any notes about this approval...'
-                    : 'Please explain the reason for rejection...'
-                }
-                value={decisionNotes}
-                onChange={(e) => setDecisionNotes(e.target.value)}
-                rows={3}
-              />
             </div>
-          </div>
-          
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowDecisionDialog(false)}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant={decisionType === 'approve' ? 'default' : 'destructive'}
-              onClick={handleSubmitDecision}
-              disabled={loading || (decisionType === 'reject' && !decisionNotes.trim())}
-            >
-              {loading ? 'Processing...' : `${decisionType === 'approve' ? 'Approve' : 'Reject'} Request`}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      CASE
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      TYPE
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      AMOUNT
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      STATUS
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      REQUESTED
+                    </th>
+                    <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      ACTIONS
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredApprovals.map((approval) => (
+                    <tr key={approval.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <div>
+                          <p className="font-medium text-gray-900">{approval.caseName}</p>
+                          <p className="text-sm text-gray-500 line-clamp-1">{approval.description}</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <Badge className={typeConfig[approval.type as keyof typeof typeConfig]?.color || 'bg-gray-100 text-gray-800'}>
+                          {typeConfig[approval.type as keyof typeof typeConfig]?.label || approval.type}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="font-medium">
+                          <Money amount={approval.amount || 0} currency={approval.currency || 'EUR'} />
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <Badge className={statusConfig[approval.state].color}>
+                          {statusConfig[approval.state].label}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm">
+                          <p className="text-gray-900">{format(new Date(approval.createdAt), 'dd/MM/yyyy')}</p>
+                          <p className="text-gray-500">by {approval.requestedByName}</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        {approval.state === 'pending' ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleReviewApproval(approval)}
+                            className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                          >
+                            Review
+                          </Button>
+                        ) : (
+                          <span className="text-sm text-gray-400">
+                            {approval.state === 'approved' ? 'Approved' : 'Rejected'}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Approval Detail Modal */}
+      {selectedApproval && (
+        <ApprovalDetailModal
+          approval={selectedApproval}
+          isOpen={showApprovalModal}
+          onOpenChange={setShowApprovalModal}
+          onDecision={handleApprovalDecision}
+        />
+      )}
     </div>
   );
 }
