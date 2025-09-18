@@ -75,16 +75,16 @@ export function AppHeader() {
   };
 
   return (
-    <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm">
-      <div className="flex h-full items-center justify-between px-6">
+    <header className="h-14 border-b border-border bg-card/50 backdrop-blur-sm">
+      <div className="flex h-full items-center justify-between px-4">
         {/* Left side - Sidebar trigger and page title */}
-        <div className="flex items-center gap-4">
-          <SidebarTrigger className="h-8 w-8" />
+        <div className="flex items-center gap-3">
+          <SidebarTrigger className="h-7 w-7" />
           <div>
             <h1 className="text-xl font-semibold text-foreground">
               {getPageName()}
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               {user?.role && (
                 <span className="capitalize">
                   {user.role.toLowerCase().replace('_', ' ')} Dashboard
@@ -95,7 +95,7 @@ export function AppHeader() {
         </div>
 
         {/* Right side - Notifications and user menu */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {/* AI Help Button */}
           <AIHelpButton onOpenAI={() => {
             // The AI Assistant is always available via the floating button
@@ -108,8 +108,8 @@ export function AppHeader() {
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                <Avatar className="h-10 w-10">
+              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                <Avatar className="h-8 w-8">
                   <AvatarFallback className="bg-primary text-primary-foreground font-medium">
                     {getUserInitials()}
                   </AvatarFallback>
@@ -119,13 +119,13 @@ export function AppHeader() {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">
+                  <p className="text-sm font-medium leading-tight">
                     {user?.name}
                   </p>
-                  <p className="text-xs leading-none text-muted-foreground">
+                  <p className="text-xs leading-tight text-muted-foreground">
                     {user?.email}
                   </p>
-                  <p className="text-xs leading-none text-muted-foreground uppercase">
+                  <p className="text-xs leading-tight text-muted-foreground uppercase">
                     {user?.role}
                   </p>
                 </div>

@@ -182,12 +182,12 @@ All colors MUST be HSL for consistency.
   
   /* Professional Card System */
   .card-professional {
-    @apply bg-card border border-border rounded-lg shadow-sm;
+    @apply bg-card border border-border rounded-md shadow-sm;
     box-shadow: var(--shadow-card);
   }
   
   .card-elevated {
-    @apply bg-card border border-border rounded-lg;
+    @apply bg-card border border-border rounded-md;
     box-shadow: var(--shadow-popover);
   }
   

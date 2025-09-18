@@ -313,8 +313,8 @@ export default function Cases() {
       </div>
 
       {/* Enhanced Filters & Saved Views */}
-      <Card className="card-professional">
-        <CardContent className="p-6">
+      <Card className="card-professional border-muted/50">
+        <CardContent className="p-4">
           <Tabs defaultValue="filters" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="filters">Filters</TabsTrigger>
@@ -322,7 +322,7 @@ export default function Cases() {
             </TabsList>
             
             <TabsContent value="filters" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                 {/* Search */}
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -330,13 +330,13 @@ export default function Cases() {
                     placeholder="Search cases..."
                     value={filters.Query || ''}
                     onChange={(e) => handleFilterChange('Query', e.target.value)}
-                    className="pl-10"
+                    className="pl-10 h-9"
                   />
                 </div>
 
                 {/* Phase Filter */}
                 <Select value={filters.Phase || 'all'} onValueChange={(value) => handleFilterChange('Phase', value === 'all' ? undefined : value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-9">
                     <SelectValue placeholder="All Phases" />
                   </SelectTrigger>
                   <SelectContent>
@@ -351,7 +351,7 @@ export default function Cases() {
 
                 {/* Zone Filter */}
                 <Select value={filters.Zone || 'all'} onValueChange={(value) => handleFilterChange('Zone', value === 'all' ? undefined : value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-9">
                     <SelectValue placeholder="All Zones" />
                   </SelectTrigger>
                   <SelectContent>
@@ -364,7 +364,7 @@ export default function Cases() {
 
                 {/* Assignee Filter */}
                 <Select value={filters.Assignee || 'all'} onValueChange={(value) => handleFilterChange('Assignee', value === 'all' ? undefined : value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-9">
                     <SelectValue placeholder="All Assignees" />
                   </SelectTrigger>
                   <SelectContent>
@@ -377,7 +377,7 @@ export default function Cases() {
                 </Select>
               </div>
               
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between pt-2">
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
@@ -429,7 +429,7 @@ export default function Cases() {
                   setSortBy(field as typeof sortBy);
                   setSortOrder(order as typeof sortOrder);
                 }}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-[160px] h-9">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent>
@@ -445,21 +445,21 @@ export default function Cases() {
             
             <TabsContent value="views" className="space-y-4">
               {savedViews.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
+                <div className="text-center py-6 text-muted-foreground">
                   <Star className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   <p>No saved views yet</p>
                   <p className="text-sm">Save your current filters to quickly access them later</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                   {savedViews.map((view) => (
                     <Card key={view.ViewId} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => handleLoadView(view)}>
-                      <CardContent className="p-4">
+                      <CardContent className="p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Star className="h-4 w-4 text-primary" />
-                          <h4 className="font-medium">{view.Name}</h4>
+                          <h4 className="font-medium text-sm">{view.Name}</h4>
                         </div>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-xs text-muted-foreground">
                           Created {new Date(view.CreatedAt).toLocaleDateString()}
                         </p>
                       </CardContent>
