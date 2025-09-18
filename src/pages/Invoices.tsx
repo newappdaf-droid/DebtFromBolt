@@ -1,5 +1,5 @@
 // Professional Invoice Management Page for B2B Debt Collection Platform
-// Complete invoice tracking with status management and financial reporting
+// Enhanced invoice view with detailed invoice dialog matching reference design
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -21,7 +21,12 @@ import {
   TrendingUp,
   DollarSign,
   Receipt,
-  Mail
+  Mail,
+  ArrowLeft,
+  Building2,
+  MapPin,
+  Phone,
+  Globe
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -47,6 +52,14 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from '@/hooks/use-toast';
 import { Money } from '@/components/ui/money';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
 import { useAuth } from '@/components/auth/AuthProvider';
 import { getInvoicesForUser } from '@/lib/mockData';
@@ -90,6 +103,198 @@ const statusConfig = {
     description: 'Invoice cancelled'
   }
 };
+
+// Enhanced invoice detail dialog component
+function InvoiceDetailDialog({ 
+  invoice, 
+  isOpen, 
+  onOpenChange 
+}: { 
+  invoice: Invoice | null; 
+  isOpen: boolean; 
+  onOpenChange: (open: boolean) => void; 
+}) {
+  if (!invoice) return null;
+
+  const handleDownload = () => {
+    toast({
+      title: 'Download Started',
+      description: `Downloading invoice ${invoice.invoiceNumber}`
+    });
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+        <DialogHeader className="pb-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <div>
+                <DialogTitle className="text-2xl font-bold">{invoice.invoiceNumber}</DialogTitle>
+                <DialogDescription>Invoice Details</DialogDescription>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <StatusBadge status={invoice.status} />
+              <div className="text-right">
+                <p className="text-sm text-muted-foreground">Issued</p>
+                <p className="text-2xl font-bold">
+                  <Money amount={invoice.totalAmount} currency={invoice.currency} />
+                </p>
+              </div>
+            </div>
+          </div>
+        </DialogHeader>
+        
+        <ScrollArea className="flex-1 px-6">
+          <div className="space-y-8">
+            {/* Company Header */}
+            <div className="flex justify-between items-start">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-primary rounded-lg">
+                  <Building2 className="h-8 w-8 text-primary-foreground" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold">DebtCollect Pro</h2>
+                  <p className="text-muted-foreground">Professional Debt Collection Services</p>
+                  <div className="mt-2 space-y-1 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-3 w-3" />
+                      <span>123 Business Street, London, SW1A 1AA, United Kingdom</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-3 w-3" />
+                      <span>VAT: GB123456789</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="text-right">
+                <h1 className="text-3xl font-bold">INVOICE</h1>
+                <div className="mt-2 space-y-1 text-sm">
+                  <p><span className="text-muted-foreground">Invoice #:</span> {invoice.invoiceNumber}</p>
+                  <p><span className="text-muted-foreground">Issue Date:</span> {format(new Date(invoice.createdAt), 'dd/MM/yyyy')}</p>
+                  <p><span className="text-muted-foreground">Due Date:</span> {format(new Date(invoice.dueDate), 'dd/MM/yyyy')}</p>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Bill To Section */}
+            <div>
+              <h3 className="font-semibold text-lg mb-3">Bill To:</h3>
+              <div className="bg-muted/30 rounded-lg p-4">
+                <p className="font-semibold">{invoice.clientName}</p>
+                <p className="text-sm text-muted-foreground">Client ID: {invoice.clientId}</p>
+              </div>
+            </div>
+
+            {/* Related Case Section */}
+            <div>
+              <h3 className="font-semibold text-lg mb-3">Related Case:</h3>
+              <div className="bg-accent/30 rounded-lg p-4">
+                <p className="font-medium text-primary">{invoice.caseName}</p>
+                <p className="text-sm text-muted-foreground">Case reference and details</p>
+              </div>
+            </div>
+
+            {/* Invoice Items Table */}
+            <div>
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-b-2">
+                    <TableHead className="font-semibold text-foreground">DESCRIPTION</TableHead>
+                    <TableHead className="font-semibold text-foreground text-center">QTY</TableHead>
+                    <TableHead className="font-semibold text-foreground text-right">UNIT PRICE</TableHead>
+                    <TableHead className="font-semibold text-foreground text-right">TOTAL</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {invoice.items.map((item, index) => (
+                    <TableRow key={index} className="border-b">
+                      <TableCell className="py-4">
+                        <div>
+                          <p className="font-medium">{item.description}</p>
+                          <p className="text-sm text-muted-foreground">Collection handling fee (5%)</p>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center py-4">{item.quantity}</TableCell>
+                      <TableCell className="text-right py-4">
+                        <Money amount={item.unitPrice} currency={invoice.currency} />
+                      </TableCell>
+                      <TableCell className="text-right py-4 font-medium">
+                        <Money amount={item.total} currency={invoice.currency} />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Totals Section */}
+            <div className="flex justify-end">
+              <div className="w-80 space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Subtotal:</span>
+                  <span className="font-medium">
+                    <Money amount={invoice.amount} currency={invoice.currency} />
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">VAT (20%):</span>
+                  <span className="font-medium">
+                    <Money amount={invoice.vatAmount} currency={invoice.currency} />
+                  </span>
+                </div>
+                <Separator />
+                <div className="flex justify-between text-lg font-bold">
+                  <span>Total:</span>
+                  <span>
+                    <Money amount={invoice.totalAmount} currency={invoice.currency} />
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Payment Terms */}
+            <div className="bg-muted/30 rounded-lg p-4">
+              <h4 className="font-semibold mb-2">Payment Terms</h4>
+              <p className="text-sm text-muted-foreground">
+                Payment is due within 30 days of invoice date. Late payments may incur additional charges. 
+                For questions regarding this invoice, please contact our billing department.
+              </p>
+            </div>
+
+            {/* Data Protection Notice */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="font-semibold mb-2 text-blue-800">Data Protection Notice</h4>
+              <p className="text-sm text-blue-700">
+                This invoice and payment data will be retained for 7 years as required by law. 
+                You have the right to request access to or deletion of your personal data in accordance with GDPR.
+              </p>
+            </div>
+          </div>
+        </ScrollArea>
+
+        {/* Footer Actions */}
+        <div className="flex justify-between items-center pt-4 border-t">
+          <Button variant="outline" onClick={handleDownload}>
+            <Download className="h-4 w-4 mr-2" />
+            Download PDF
+          </Button>
+          <Button className="bg-green-600 hover:bg-green-700 text-white">
+            Pay Now
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export default function Invoices() {
   const navigate = useNavigate();
@@ -184,6 +389,29 @@ export default function Invoices() {
     });
   };
 
+  const exportCSV = () => {
+    const csvContent = [
+      ['Invoice', 'Case', 'Client', 'Total', 'Status', 'Due Date', 'Actions'].join(','),
+      ...filteredInvoices.map(inv => [
+        inv.invoiceNumber,
+        inv.caseName,
+        inv.clientName,
+        `${inv.currency} ${inv.totalAmount}`,
+        inv.status,
+        format(new Date(inv.dueDate), 'dd/MM/yyyy'),
+        'View Download'
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `invoices-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   // Calculate statistics
   const stats = {
     total: invoices.length,
@@ -200,18 +428,24 @@ export default function Invoices() {
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Invoice Management</h1>
+          <h1 className="text-3xl font-bold">Invoices</h1>
           <p className="text-muted-foreground">
-            Track and manage your collection service invoices
+            Manage collection fees and service invoices
           </p>
         </div>
         
-        {user?.role === 'ADMIN' && (
-          <Button onClick={() => navigate('/invoices/new')}>
-            <FileText className="h-4 w-4 mr-2" />
-            Create Invoice
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={exportCSV}>
+            <Download className="h-4 w-4 mr-2" />
+            Export CSV
           </Button>
-        )}
+          {user?.role === 'ADMIN' && (
+            <Button onClick={() => navigate('/invoices/new')}>
+              <FileText className="h-4 w-4 mr-2" />
+              Create Invoice
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -333,11 +567,11 @@ export default function Invoices() {
         </CardContent>
       </Card>
 
-      {/* Invoices List */}
-      <div className="grid gap-6">
-        {filteredInvoices.length === 0 ? (
-          <Card className="card-professional">
-            <CardContent className="py-12 text-center">
+      {/* Invoices Table */}
+      <Card className="card-professional">
+        <CardContent className="p-0">
+          {filteredInvoices.length === 0 ? (
+            <div className="py-12 text-center">
               <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <h3 className="text-lg font-medium mb-2">No invoices found</h3>
               <p className="text-muted-foreground">
@@ -346,206 +580,104 @@ export default function Invoices() {
                   : 'Invoices will appear here when created.'
                 }
               </p>
-            </CardContent>
-          </Card>
-        ) : (
-          filteredInvoices.map((invoice) => {
-            const StatusIcon = statusConfig[invoice.status].icon;
-            const isOverdue = invoice.status === 'overdue';
-            
-            return (
-              <Card key={invoice.id} className="card-professional hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className={`p-3 rounded-lg ${isOverdue ? 'bg-destructive/10' : 'bg-primary/10'}`}>
-                      <StatusIcon className={`h-6 w-6 ${isOverdue ? 'text-destructive' : 'text-primary'}`} />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4 mb-3">
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow className="border-b-2">
+                  <TableHead className="font-semibold text-foreground">INVOICE</TableHead>
+                  <TableHead className="font-semibold text-foreground">CASE</TableHead>
+                  <TableHead className="font-semibold text-foreground">CLIENT</TableHead>
+                  <TableHead className="font-semibold text-foreground text-right">TOTAL</TableHead>
+                  <TableHead className="font-semibold text-foreground">STATUS</TableHead>
+                  <TableHead className="font-semibold text-foreground">DUE DATE</TableHead>
+                  <TableHead className="font-semibold text-foreground text-right">ACTIONS</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredInvoices.map((invoice) => {
+                  const StatusIcon = statusConfig[invoice.status].icon;
+                  const isOverdue = invoice.status === 'overdue';
+                  
+                  return (
+                    <TableRow key={invoice.id} className="hover:bg-muted/30 cursor-pointer" onClick={() => handleViewInvoice(invoice)}>
+                      <TableCell className="py-4">
                         <div>
-                          <h3 className="font-semibold text-lg mb-1">
-                            Invoice {invoice.invoiceNumber}
-                          </h3>
+                          <p className="font-semibold text-primary">{invoice.invoiceNumber}</p>
                           <p className="text-sm text-muted-foreground">
-                            {invoice.clientName} • {invoice.caseName}
+                            Issued {format(new Date(invoice.createdAt), 'dd/MM/yyyy')}
                           </p>
                         </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <StatusBadge status={invoice.status} />
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                      </TableCell>
+                      <TableCell className="py-4">
                         <div>
-                          <p className="text-sm text-muted-foreground">Amount</p>
-                          <p className="font-semibold">
-                            <Money amount={invoice.amount} currency={invoice.currency} />
-                          </p>
+                          <p className="font-medium text-primary">{invoice.caseName}</p>
+                          <p className="text-sm text-muted-foreground">Case reference</p>
                         </div>
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <p className="font-medium">{invoice.clientName}</p>
+                      </TableCell>
+                      <TableCell className="py-4 text-right">
                         <div>
-                          <p className="text-sm text-muted-foreground">VAT</p>
-                          <p className="font-semibold">
-                            <Money amount={invoice.vatAmount} currency={invoice.currency} />
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Total</p>
-                          <p className="font-semibold text-lg">
+                          <p className="font-bold text-lg">
                             <Money amount={invoice.totalAmount} currency={invoice.currency} />
                           </p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Due Date</p>
-                          <p className="font-semibold">
-                            {format(new Date(invoice.dueDate), 'MMM dd, yyyy')}
+                          <p className="text-sm text-muted-foreground">
+                            VAT: <Money amount={invoice.vatAmount} currency={invoice.currency} />
                           </p>
                         </div>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span>Created {format(new Date(invoice.createdAt), 'MMM dd, yyyy')}</span>
-                          {invoice.paidAt && (
-                            <span>Paid {format(new Date(invoice.paidAt), 'MMM dd, yyyy')}</span>
-                          )}
-                        </div>
-                        
-                        <div className="flex gap-2">
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <StatusBadge status={invoice.status} />
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <p className="font-medium">{format(new Date(invoice.dueDate), 'dd/MM/yyyy')}</p>
+                        {invoice.paidAt && (
+                          <p className="text-sm text-success">
+                            Paid {format(new Date(invoice.paidAt), 'dd/MM/yyyy')}
+                          </p>
+                        )}
+                      </TableCell>
+                      <TableCell className="py-4 text-right">
+                        <div className="flex gap-1 justify-end">
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
-                            onClick={() => handleViewInvoice(invoice)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewInvoice(invoice);
+                            }}
                           >
-                            <Eye className="h-4 w-4 mr-2" />
                             View
                           </Button>
-                          
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
-                            onClick={() => handleDownloadInvoice(invoice)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDownloadInvoice(invoice);
+                            }}
                           >
-                            <Download className="h-4 w-4 mr-2" />
                             Download
                           </Button>
-                          
-                          {invoice.status === 'sent' && user?.role === 'ADMIN' && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleSendReminder(invoice)}
-                            >
-                              <Mail className="h-4 w-4 mr-2" />
-                              Remind
-                            </Button>
-                          )}
                         </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })
-        )}
-      </div>
-
-      {/* Invoice Detail Dialog */}
-      <Dialog open={showInvoiceDialog} onOpenChange={setShowInvoiceDialog}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Invoice Details</DialogTitle>
-            <DialogDescription>
-              {selectedInvoice && `Invoice ${selectedInvoice.invoiceNumber} for ${selectedInvoice.clientName}`}
-            </DialogDescription>
-          </DialogHeader>
-          
-          {selectedInvoice && (
-            <ScrollArea className="max-h-96">
-              <div className="space-y-6">
-                {/* Invoice Header */}
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-lg font-semibold">Invoice {selectedInvoice.invoiceNumber}</h3>
-                    <p className="text-muted-foreground">{selectedInvoice.caseName}</p>
-                  </div>
-                  <StatusBadge status={selectedInvoice.status} />
-                </div>
-                
-                <Separator />
-                
-                {/* Client Information */}
-                <div>
-                  <h4 className="font-medium mb-2">Bill To</h4>
-                  <p className="font-semibold">{selectedInvoice.clientName}</p>
-                </div>
-                
-                <Separator />
-                
-                {/* Line Items */}
-                <div>
-                  <h4 className="font-medium mb-3">Items</h4>
-                  <div className="space-y-2">
-                    {selectedInvoice.items.map((item, index) => (
-                      <div key={index} className="flex justify-between items-center py-2">
-                        <div className="flex-1">
-                          <p className="font-medium">{item.description}</p>
-                          <p className="text-sm text-muted-foreground">
-                            Qty: {item.quantity} × <Money amount={item.unitPrice} currency={selectedInvoice.currency} />
-                          </p>
-                        </div>
-                        <p className="font-semibold">
-                          <Money amount={item.total} currency={selectedInvoice.currency} />
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <Separator />
-                
-                {/* Totals */}
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <p>Subtotal</p>
-                    <p><Money amount={selectedInvoice.amount} currency={selectedInvoice.currency} /></p>
-                  </div>
-                  <div className="flex justify-between">
-                    <p>VAT (20%)</p>
-                    <p><Money amount={selectedInvoice.vatAmount} currency={selectedInvoice.currency} /></p>
-                  </div>
-                  <div className="flex justify-between text-lg font-semibold">
-                    <p>Total</p>
-                    <p><Money amount={selectedInvoice.totalAmount} currency={selectedInvoice.currency} /></p>
-                  </div>
-                </div>
-                
-                <Separator />
-                
-                {/* Dates */}
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p className="text-muted-foreground">Created</p>
-                    <p>{format(new Date(selectedInvoice.createdAt), 'PPP')}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Due Date</p>
-                    <p>{format(new Date(selectedInvoice.dueDate), 'PPP')}</p>
-                  </div>
-                  {selectedInvoice.paidAt && (
-                    <div>
-                      <p className="text-muted-foreground">Paid</p>
-                      <p>{format(new Date(selectedInvoice.paidAt), 'PPP')}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </ScrollArea>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           )}
-        </DialogContent>
-      </Dialog>
+        </CardContent>
+      </Card>
+
+      {/* Enhanced Invoice Detail Dialog */}
+      <InvoiceDetailDialog
+        invoice={selectedInvoice}
+        isOpen={showInvoiceDialog}
+        onOpenChange={setShowInvoiceDialog}
+      />
     </div>
   );
 }
