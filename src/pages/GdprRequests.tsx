@@ -41,6 +41,8 @@ import {
   DialogFooter
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
@@ -106,6 +108,159 @@ const typeConfig = {
   }
 };
 
+// New reusable dialog for GDPR requests
+interface NewGdprRequestDialogProps {
+  requestType: 'SAR' | 'ERASURE';
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  onCreate: (data: {
+    type: 'SAR' | 'ERASURE';
+    subjectName: string;
+    subjectEmail: string;
+    description: string;
+    confirmation: boolean;
+  }) => void;
+}
+
+function NewGdprRequestDialog({ requestType, isOpen, onOpenChange, onCreate }: NewGdprRequestDialogProps) {
+  const [subjectName, setSubjectName] = useState('');
+  const [subjectEmail, setSubjectEmail] = useState('');
+  const [description, setDescription] = useState('');
+  const [confirmation, setConfirmation] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const isSAR = requestType === 'SAR';
+  const dialogTitle = isSAR ? 'Subject Access Request (SAR)' : 'Erasure Request (Right to be Forgotten)';
+  const aboutText = isSAR
+    ? 'We will provide a comprehensive export of all personal data we hold about the specified individual within 30 days. This may include case data, communications, documents, and audit logs where the individual is referenced.'
+    : 'This will permanently delete all non-legally required personal data from our systems within 30 days. Some data may be retained if required by law (e.g., financial records for tax purposes). Legal holds may prevent deletion.';
+  const legalNotice = isSAR
+    ? 'This request will be processed in accordance with GDPR Article 15 and our Data Protection Policy. We may require additional information to verify the identity of the data subject before processing this request. Response times may be extended if the request is complex or if we receive multiple requests from you.'
+    : 'This request will be processed in accordance with GDPR Article 17 and our Data Protection Policy. We may require additional information to verify the identity of the data subject before processing this request. Response times may be extended if the request is complex or if we receive multiple requests from you.';
+
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+    if (!subjectName.trim()) newErrors.subjectName = 'Subject Name is required.';
+    if (!subjectEmail.trim()) newErrors.subjectEmail = 'Subject Email is required.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(subjectEmail)) newErrors.subjectEmail = 'Invalid email format.';
+    if (!description.trim()) newErrors.description = 'Request Description is required.';
+    if (!confirmation) newErrors.confirmation = 'You must confirm to proceed.';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = () => {
+    if (validate()) {
+      onCreate({ type: requestType, subjectName, subjectEmail, description, confirmation });
+      // Reset form
+      setSubjectName('');
+      setSubjectEmail('');
+      setDescription('');
+      setConfirmation(false);
+      setErrors({});
+      onOpenChange(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setSubjectName('');
+    setSubjectEmail('');
+    setDescription('');
+    setConfirmation(false);
+    setErrors({});
+    onOpenChange(false);
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            {isSAR ? <FileDown className="h-5 w-5 text-primary" /> : <Trash2 className="h-5 w-5 text-destructive" />}
+            {dialogTitle}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <Card className={`border-l-4 ${isSAR ? 'border-l-primary bg-primary/5' : 'border-l-destructive bg-destructive/5'}`}>
+            <CardContent className="p-4 text-sm">
+              <h4 className="font-semibold mb-2">About This Request</h4>
+              <p>{aboutText}</p>
+            </CardContent>
+          </Card>
+
+          <div>
+            <Label htmlFor="subjectName">Subject Name <span className="text-destructive">*</span></Label>
+            <Input
+              id="subjectName"
+              value={subjectName}
+              onChange={(e) => { setSubjectName(e.target.value); setErrors(prev => ({ ...prev, subjectName: '' })); }}
+              placeholder="Full name of the data subject"
+              className={errors.subjectName ? 'border-destructive' : ''}
+            />
+            {errors.subjectName && <p className="text-sm text-destructive mt-1">{errors.subjectName}</p>}
+          </div>
+
+          <div>
+            <Label htmlFor="subjectEmail">Subject Email <span className="text-destructive">*</span></Label>
+            <Input
+              id="subjectEmail"
+              type="email"
+              value={subjectEmail}
+              onChange={(e) => { setSubjectEmail(e.target.value); setErrors(prev => ({ ...prev, subjectEmail: '' })); }}
+              placeholder="Email address of the data subject"
+              className={errors.subjectEmail ? 'border-destructive' : ''}
+            />
+            {errors.subjectEmail && <p className="text-sm text-destructive mt-1">{errors.subjectEmail}</p>}
+          </div>
+
+          <div>
+            <Label htmlFor="description">Request Description <span className="text-destructive">*</span></Label>
+            <Textarea
+              id="description"
+              value={description}
+              onChange={(e) => { setDescription(e.target.value); setErrors(prev => ({ ...prev, description: '' })); }}
+              placeholder={isSAR ? "Provide details about this access request..." : "Provide details about this erasure request..."}
+              rows={3}
+              className={errors.description ? 'border-destructive' : ''}
+            />
+            {errors.description && <p className="text-sm text-destructive mt-1">{errors.description}</p>}
+          </div>
+
+          <div className="flex items-start space-x-2">
+            <Checkbox
+              id="confirmation"
+              checked={confirmation}
+              onCheckedChange={(checked) => { setConfirmation(checked === true); setErrors(prev => ({ ...prev, confirmation: '' })); }}
+            />
+            <Label htmlFor="confirmation" className="text-sm leading-relaxed cursor-pointer">
+              I confirm that I understand this request will be processed within 30 days and that identity verification may be required. <span className="text-destructive">*</span>
+            </Label>
+          </div>
+          {errors.confirmation && <p className="text-sm text-destructive mt-1">{errors.confirmation}</p>}
+
+          <Card className="border-l-4 border-l-warning bg-warning/5">
+            <CardContent className="p-4 text-sm">
+              <h4 className="font-semibold mb-2">Legal Notice</h4>
+              <p>{legalNotice}</p>
+            </CardContent>
+          </Card>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleSubmit}
+            className={isSAR ? '' : 'bg-destructive hover:bg-destructive/90'}
+          >
+            {isSAR ? 'Create SAR' : 'Create Erasure Request'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function GdprRequests() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -114,13 +269,9 @@ export default function GdprRequests() {
   const [requests, setRequests] = useState<GdprRequest[]>([]);
   const [filteredRequests, setFilteredRequests] = useState<GdprRequest[]>([]);
   const [selectedRequest, setSelectedRequest] = useState<GdprRequest | null>(null);
-  const [showRequestDialog, setShowRequestDialog] = useState(false);
-  const [showNewRequestDialog, setShowNewRequestDialog] = useState(false);
-  
-  // New request form
-  const [newRequestType, setNewRequestType] = useState<string>('');
-  const [newRequestSubject, setNewRequestSubject] = useState('');
-  const [newRequestDescription, setNewRequestDescription] = useState('');
+  const [showRequestDetailDialog, setShowRequestDetailDialog] = useState(false);
+  const [showNewSARDialog, setShowNewSARDialog] = useState(false);
+  const [showNewErasureDialog, setShowNewErasureDialog] = useState(false);
   
   // Filters
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all');
@@ -159,25 +310,31 @@ export default function GdprRequests() {
     setFilteredRequests(filtered);
   }, [requests, statusFilter, typeFilter, searchQuery]);
 
-  const handleViewRequest = (request: GdprRequest) => {
+  const handleViewRequestDetails = (request: GdprRequest) => {
     setSelectedRequest(request);
-    setShowRequestDialog(true);
+    setShowRequestDetailDialog(true);
   };
 
   const handleDownloadCertificate = (request: GdprRequest) => {
     if (request.downloadUrl) {
       toast({
         title: 'Download Started',
-        description: `Downloading completion certificate for request ${request.id}`
+        description: `Downloading completion certificate for request ${request.id}`,
       });
     }
   };
 
-  const handleCreateRequest = async () => {
-    if (!newRequestType || !newRequestSubject || !newRequestDescription) {
+  const handleCreateRequest = async (data: {
+    type: 'SAR' | 'ERASURE';
+    subjectName: string;
+    subjectEmail: string;
+    description: string;
+    confirmation: boolean;
+  }) => {
+    if (!data.confirmation) {
       toast({
-        title: 'Incomplete Form',
-        description: 'Please fill in all required fields.',
+        title: 'Confirmation Required',
+        description: 'You must confirm understanding before proceeding.',
         variant: 'destructive'
       });
       return;
@@ -185,24 +342,19 @@ export default function GdprRequests() {
 
     const newRequest: GdprRequest = {
       id: `gdpr_${Date.now()}`,
-      type: newRequestType as any,
+      type: data.type,
       status: 'pending',
       requestedBy: user?.id || 'current_user',
       requestedByName: user?.name || 'Current User',
-      dataSubject: newRequestSubject,
-      description: newRequestDescription,
+      dataSubject: data.subjectName,
+      dataSubjectEmail: data.subjectEmail,
+      description: data.description,
       dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       createdAt: new Date().toISOString(),
       affectedCases: []
     };
 
     setRequests([newRequest, ...requests]);
-    setShowNewRequestDialog(false);
-    
-    // Reset form
-    setNewRequestType('');
-    setNewRequestSubject('');
-    setNewRequestDescription('');
     
     toast({
       title: 'Request Created',
@@ -251,27 +403,128 @@ export default function GdprRequests() {
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">GDPR Requests</h1>
+          <h1 className="text-3xl font-bold flex items-center gap-3">
+            <Shield className="h-8 w-8 text-primary" />
+            GDPR Dashboard
+          </h1>
           <p className="text-muted-foreground">
-            Manage data privacy requests and ensure GDPR compliance
+            Manage data protection requests and compliance
           </p>
         </div>
         
-        <div className="flex gap-2">
-          {user?.role === 'DPO' && (
-            <Button onClick={() => setShowNewRequestDialog(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              New Request
-            </Button>
-          )}
-          
-          {stats.overdue > 0 && (
-            <Badge variant="outline" className="text-sm py-2 px-4 border-destructive text-destructive">
-              {stats.overdue} Overdue
-            </Badge>
-          )}
-        </div>
+        {stats.overdue > 0 && (
+          <Badge variant="outline" className="text-sm py-2 px-4 border-destructive text-destructive">
+            {stats.overdue} Overdue
+          </Badge>
+        )}
       </div>
+
+      {/* Request Creation Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="card-professional hover:shadow-md transition-shadow">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <FileDown className="h-6 w-6 text-primary" />
+              </div>
+              <CardTitle>Subject Access Request</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Request access to all personal data we hold about a specific individual. We have 30 days to respond with a comprehensive data export.
+            </p>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowNewSARDialog(true)}
+              className="w-full"
+            >
+              Create SAR →
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="card-professional hover:shadow-md transition-shadow">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-destructive/10 rounded-lg">
+                <Trash2 className="h-6 w-6 text-destructive" />
+              </div>
+              <CardTitle>Erasure Request</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Request deletion of personal data under the "Right to be Forgotten". This will remove all non-legally required data from our systems.
+            </p>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowNewErasureDialog(true)}
+              className="w-full text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+            >
+              Create Erasure Request →
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Your GDPR Rights Section */}
+      <Card className="card-professional">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5" />
+            Your GDPR Rights
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-semibold flex items-center gap-2 text-primary">
+                <FileDown className="h-4 w-4" />
+                Right to Access (SAR)
+              </h4>
+              <p className="text-sm text-muted-foreground">
+                You have the right to request copies of all personal data we hold about you.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold flex items-center gap-2 text-primary">
+                <FileText className="h-4 w-4" />
+                Right to Rectification
+              </h4>
+              <p className="text-sm text-muted-foreground">
+                You can request correction of inaccurate or incomplete data.
+              </p>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-semibold flex items-center gap-2 text-destructive">
+                <Trash2 className="h-4 w-4" />
+                Right to Erasure
+              </h4>
+              <p className="text-sm text-muted-foreground">
+                You can request deletion of your personal data in certain circumstances.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold flex items-center gap-2 text-primary">
+                <Download className="h-4 w-4" />
+                Right to Portability
+              </h4>
+              <p className="text-sm text-muted-foreground">
+                You can request your data in a structured, machine-readable format.
+              </p>
+            </div>
+          </div>
+          <div className="col-span-2 pt-4 border-t text-sm text-muted-foreground">
+            <p>
+              <span className="font-semibold text-primary">Response Time:</span> We will respond to your request within 30 days of receipt.{' '}
+              <span className="font-semibold text-primary">Identity Verification:</span> We may need to verify your identity before processing requests.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
@@ -385,7 +638,7 @@ export default function GdprRequests() {
                   <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="SAR">Subject Access Request</SelectItem>
                   <SelectItem value="ERASURE">Right to Erasure</SelectItem>
-                  <SelectItem value="RECTIFICATION">Rectification</SelectItem>
+                  <SelectItem value="RECTIFICATION">Right to Rectification</SelectItem>
                   <SelectItem value="PORTABILITY">Data Portability</SelectItem>
                   <SelectItem value="OBJECTION">Right to Object</SelectItem>
                 </SelectContent>
@@ -395,11 +648,14 @@ export default function GdprRequests() {
         </CardContent>
       </Card>
 
-      {/* GDPR Requests List */}
-      <div className="grid gap-6">
-        {filteredRequests.length === 0 ? (
-          <Card className="card-professional">
-            <CardContent className="py-12 text-center">
+      {/* Your GDPR Requests Table */}
+      <Card className="card-professional">
+        <CardHeader>
+          <CardTitle>Your GDPR Requests</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {filteredRequests.length === 0 ? (
+            <div className="text-center py-12">
               <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <h3 className="text-lg font-medium mb-2">No GDPR requests found</h3>
               <p className="text-muted-foreground">
@@ -408,134 +664,107 @@ export default function GdprRequests() {
                   : 'GDPR requests will appear here when submitted.'
                 }
               </p>
-            </CardContent>
-          </Card>
-        ) : (
-          filteredRequests.map((request) => {
-            const StatusIcon = statusConfig[request.status].icon;
-            const TypeIcon = typeConfig[request.type as keyof typeof typeConfig]?.icon || Shield;
-            const daysRemaining = getDaysRemaining(request.dueDate);
-            const isOverdue = daysRemaining < 0 && request.status !== 'completed';
-            const progress = getProgressPercentage(request);
-            
-            return (
-              <Card key={request.id} className="card-professional hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className={`p-3 rounded-lg ${isOverdue ? 'bg-destructive/10' : 'bg-primary/10'}`}>
-                      <TypeIcon className={`h-6 w-6 ${isOverdue ? 'text-destructive' : 'text-primary'}`} />
-                    </div>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">TYPE</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">SUBJECT</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">STATUS</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">REQUESTED</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">DUE DATE</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredRequests.map((request) => {
+                    const TypeIcon = typeConfig[request.type as keyof typeof typeConfig]?.icon || Shield;
+                    const daysRemaining = getDaysRemaining(request.dueDate);
+                    const isOverdue = daysRemaining < 0 && request.status !== 'completed';
                     
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4 mb-3">
-                        <div>
-                          <h3 className="font-semibold text-lg mb-1">
-                            {typeConfig[request.type as keyof typeof typeConfig]?.label || request.type}
-                          </h3>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            Request ID: {request.id}
-                          </p>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          <StatusBadge status={request.status} />
-                          {isOverdue && (
-                            <Badge variant="outline" className="border-destructive text-destructive">
-                              Overdue
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                      
-                      <p className="text-sm mb-4 line-clamp-2">{request.description}</p>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div className="flex items-center gap-2 text-sm">
-                          <Database className="h-4 w-4 text-muted-foreground" />
-                          <span>Subject: {request.dataSubject}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <User className="h-4 w-4 text-muted-foreground" />
-                          <span>Requested by {request.requestedByName}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                          <span>
-                            Due {format(new Date(request.dueDate), 'MMM dd, yyyy')}
-                            {daysRemaining >= 0 && ` (${daysRemaining} days)`}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      {/* Progress Bar */}
-                      {request.status !== 'completed' && request.status !== 'rejected' && request.status !== 'cancelled' && (
-                        <div className="mb-4">
-                          <div className="flex items-center justify-between text-sm mb-2">
-                            <span className="text-muted-foreground">Progress</span>
-                            <span className="font-medium">{Math.round(progress)}%</span>
+                    return (
+                      <tr key={request.id} className="border-b hover:bg-muted/30 transition-colors">
+                        <td className="py-4 px-4">
+                          <div className="flex items-center gap-2">
+                            <div className={`p-1.5 rounded ${request.type === 'SAR' ? 'bg-warning/10' : 'bg-destructive/10'}`}>
+                              <TypeIcon className={`h-4 w-4 ${request.type === 'SAR' ? 'text-warning' : 'text-destructive'}`} />
+                            </div>
+                            <span className="font-medium text-sm">
+                              {request.type}
+                            </span>
                           </div>
-                          <Progress 
-                            value={progress} 
-                            className={`h-2 ${isOverdue ? 'bg-destructive/20' : ''}`}
-                          />
-                        </div>
-                      )}
-                      
-                      {/* Affected Cases */}
-                      {request.affectedCases && request.affectedCases.length > 0 && (
-                        <div className="bg-accent/50 rounded-lg p-3 mb-4">
-                          <h4 className="font-medium text-sm mb-2">Affected Cases</h4>
-                          <div className="flex flex-wrap gap-1">
-                            {request.affectedCases.map((caseId, index) => (
-                              <Badge key={index} variant="outline" className="text-xs">
-                                {caseId}
-                              </Badge>
-                            ))}
+                        </td>
+                        <td className="py-4 px-4">
+                          <div>
+                            <p className="font-medium">{request.dataSubject}</p>
+                            {request.dataSubjectEmail && (
+                              <p className="text-sm text-muted-foreground">{request.dataSubjectEmail}</p>
+                            )}
                           </div>
-                        </div>
-                      )}
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span>Created {format(new Date(request.createdAt), 'MMM dd, yyyy')}</span>
-                          {request.completedAt && (
-                            <span>Completed {format(new Date(request.completedAt), 'MMM dd, yyyy')}</span>
-                          )}
-                        </div>
-                        
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleViewRequest(request)}
+                        </td>
+                        <td className="py-4 px-4">
+                          <Badge 
+                            variant={
+                              request.status === 'completed' ? 'default' :
+                              request.status === 'processing' ? 'secondary' :
+                              request.status === 'pending' ? 'outline' : 'destructive'
+                            }
+                            className={
+                              request.status === 'processing' ? 'bg-warning/10 text-warning border-warning' : ''
+                            }
                           >
-                            <Eye className="h-4 w-4 mr-2" />
-                            View Details
-                          </Button>
-                          
-                          {request.downloadUrl && (
+                            {request.status === 'processing' ? 'In Progress' : 
+                             request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                          </Badge>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="text-sm">
+                            <p>{format(new Date(request.createdAt), 'dd/MM/yyyy')}</p>
+                            <p className="text-muted-foreground">by {request.requestedByName}</p>
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="text-sm">
+                            <p>{format(new Date(request.dueDate), 'dd/MM/yyyy')}</p>
+                            {isOverdue && (
+                              <p className="text-destructive font-medium">Overdue</p>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-4 px-4">
+                          <div className="flex gap-1">
                             <Button
-                              variant="outline"
+                              variant="ghost"
                               size="sm"
-                              onClick={() => handleDownloadCertificate(request)}
+                              onClick={() => handleViewRequestDetails(request)}
                             >
-                              <Download className="h-4 w-4 mr-2" />
-                              Certificate
+                              <Eye className="h-4 w-4" />
                             </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })
-        )}
-      </div>
+                            {request.downloadUrl && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDownloadCertificate(request)}
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Request Detail Dialog */}
-      <Dialog open={showRequestDialog} onOpenChange={setShowRequestDialog}>
+      <Dialog open={showRequestDetailDialog} onOpenChange={setShowRequestDetailDialog}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>GDPR Request Details</DialogTitle>
@@ -565,6 +794,9 @@ export default function GdprRequests() {
                   <div>
                     <p className="text-sm text-muted-foreground">Data Subject</p>
                     <p className="font-semibold">{selectedRequest.dataSubject}</p>
+                    {selectedRequest.dataSubjectEmail && (
+                      <p className="text-sm text-muted-foreground">{selectedRequest.dataSubjectEmail}</p>
+                    )}
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Requested By</p>
@@ -618,66 +850,21 @@ export default function GdprRequests() {
         </DialogContent>
       </Dialog>
 
-      {/* New Request Dialog */}
-      <Dialog open={showNewRequestDialog} onOpenChange={setShowNewRequestDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Create New GDPR Request</DialogTitle>
-            <DialogDescription>
-              Submit a new data privacy request for processing.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block">Request Type</label>
-              <Select value={newRequestType} onValueChange={setNewRequestType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select request type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="SAR">Subject Access Request</SelectItem>
-                  <SelectItem value="ERASURE">Right to Erasure</SelectItem>
-                  <SelectItem value="RECTIFICATION">Right to Rectification</SelectItem>
-                  <SelectItem value="PORTABILITY">Data Portability</SelectItem>
-                  <SelectItem value="OBJECTION">Right to Object</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <label className="text-sm font-medium mb-2 block">Data Subject</label>
-              <Input
-                placeholder="Name or identifier of the data subject"
-                value={newRequestSubject}
-                onChange={(e) => setNewRequestSubject(e.target.value)}
-              />
-            </div>
-            
-            <div>
-              <label className="text-sm font-medium mb-2 block">Description</label>
-              <Textarea
-                placeholder="Provide details about this GDPR request..."
-                value={newRequestDescription}
-                onChange={(e) => setNewRequestDescription(e.target.value)}
-                rows={3}
-              />
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowNewRequestDialog(false)}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleCreateRequest}>
-              Create Request
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* New SAR Dialog */}
+      <NewGdprRequestDialog
+        requestType="SAR"
+        isOpen={showNewSARDialog}
+        onOpenChange={setShowNewSARDialog}
+        onCreate={handleCreateRequest}
+      />
+
+      {/* New Erasure Dialog */}
+      <NewGdprRequestDialog
+        requestType="ERASURE"
+        isOpen={showNewErasureDialog}
+        onOpenChange={setShowNewErasureDialog}
+        onCreate={handleCreateRequest}
+      />
     </div>
   );
 }

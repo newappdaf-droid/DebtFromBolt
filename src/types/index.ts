@@ -151,6 +151,7 @@ export interface GdprRequest {
   status: 'pending' | 'processing' | 'completed' | 'cancelled' | 'rejected';
   requestedBy: string;
   requestedByName: string;
+  dataSubjectEmail?: string;
   dataSubject: string;
   description: string;
   dueDate: string;
