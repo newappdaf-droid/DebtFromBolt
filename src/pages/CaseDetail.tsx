@@ -389,30 +389,30 @@ export default function CaseDetail() {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Principal:</span>
-                  <span className="font-medium">{caseFinance.Currency} {caseFinance.Principal.toLocaleString()}</span>
+                  <span className="font-medium">{caseFinance.Currency} {(caseFinance.Principal ?? 0).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Fees:</span>
-                  <span className="font-medium">{caseFinance.Currency} {caseFinance.Fees.toLocaleString()}</span>
+                  <span className="font-medium">{caseFinance.Currency} {(caseFinance.Fees ?? 0).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Payments:</span>
-                  <span className="font-medium text-green-600">{caseFinance.Currency} {caseFinance.PaymentsTotal.toLocaleString()}</span>
+                  <span className="font-medium text-green-600">{caseFinance.Currency} {(caseFinance.PaymentsTotal ?? 0).toLocaleString()}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between">
                   <span className="text-sm font-medium">Open to Pay:</span>
-                  <span className="font-bold text-lg">{caseFinance.Currency} {caseFinance.OpenToPay.toLocaleString()}</span>
+                  <span className="font-bold text-lg">{caseFinance.Currency} {(caseFinance.OpenToPay ?? 0).toLocaleString()}</span>
                 </div>
                 
                 {/* Payment Progress */}
                 <div className="mt-4">
                   <div className="flex justify-between text-sm mb-2">
                     <span>Recovery Progress</span>
-                    <span>{Math.round((caseFinance.PaymentsTotal / (caseFinance.Principal + caseFinance.Fees)) * 100)}%</span>
+                    <span>{Math.round(((caseFinance.PaymentsTotal ?? 0) / ((caseFinance.Principal ?? 0) + (caseFinance.Fees ?? 0))) * 100) || 0}%</span>
                   </div>
                   <Progress 
-                    value={(caseFinance.PaymentsTotal / (caseFinance.Principal + caseFinance.Fees)) * 100} 
+                    value={((caseFinance.PaymentsTotal ?? 0) / ((caseFinance.Principal ?? 0) + (caseFinance.Fees ?? 0))) * 100 || 0} 
                     className="h-2"
                   />
                 </div>
