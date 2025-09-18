@@ -134,6 +134,12 @@ function InvoiceDetailDialog({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden p-0">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Invoice Details - {invoice.invoiceNumber}</DialogTitle>
+          <DialogDescription>
+            View and manage invoice {invoice.invoiceNumber} for {invoice.clientName}
+          </DialogDescription>
+        </DialogHeader>
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b bg-background">
           <div className="flex items-center gap-4">
