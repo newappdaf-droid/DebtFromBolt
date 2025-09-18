@@ -132,6 +132,7 @@ function ApprovalDetailModal({ approval, isOpen, onOpenChange, onDecision }: App
   const [comments, setComments] = useState('');
   const [selectedDecision, setSelectedDecision] = useState<'approved' | 'rejected' | null>(null);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleDecision = (decision: 'approved' | 'rejected') => {
     setSelectedDecision(decision);
@@ -169,7 +170,15 @@ function ApprovalDetailModal({ approval, isOpen, onOpenChange, onDecision }: App
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="text-muted-foreground">Case:</span>
-                <p className="font-medium">{approval.caseName}</p>
+                <button
+                  onClick={() => {
+                    navigate(`/cases/${approval.caseId}`);
+                    onOpenChange(false);
+                  }}
+                  className="font-medium text-primary hover:text-primary/80 hover:underline text-left"
+                >
+                  {approval.caseName}
+                </button>
               </div>
               <div className="text-right">
                 <span className="text-muted-foreground">Amount:</span>
