@@ -160,8 +160,8 @@ class MockDataStore {
         FromUserId: message.fromUserId,
         ToUserId: message.toUserId,
         Body: message.content,
-        HasAttachments: message.attachments && message.attachments.length > 0,
-        CreatedAt: message.timestamp
+        HasAttachments: false,
+        CreatedAt: message.createdAt
       };
       this.messages.push(caseMessage);
     });
