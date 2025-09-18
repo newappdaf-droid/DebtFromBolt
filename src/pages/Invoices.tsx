@@ -1,5 +1,5 @@
 // Professional Invoice Management Page for B2B Debt Collection Platform
-// Enhanced invoice view with detailed invoice dialog matching reference design
+// Enhanced invoice view with dedicated invoice detail page matching reference design
 
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -23,10 +23,7 @@ import {
   Receipt,
   Mail,
   ArrowLeft,
-  Building2,
-  MapPin,
-  Phone,
-  Globe
+  Building2
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -41,15 +38,6 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle,
-  DialogDescription
-} from '@/components/ui/dialog';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from '@/hooks/use-toast';
 import { Money } from '@/components/ui/money';
 import {
@@ -104,214 +92,205 @@ const statusConfig = {
   }
 };
 
-// Enhanced invoice detail dialog component
-function InvoiceDetailDialog({ 
+// Invoice Detail Component matching the exact structure provided
+function InvoiceDetailView({ 
   invoice, 
-  isOpen, 
-  onOpenChange 
+  onBack 
 }: { 
-  invoice: Invoice | null; 
-  isOpen: boolean; 
-  onOpenChange: (open: boolean) => void; 
+  invoice: Invoice; 
+  onBack: () => void; 
 }) {
-  if (!invoice) return null;
-
-  const handleDownload = () => {
-    toast({
-      title: 'Download Started',
-      description: `Downloading invoice ${invoice.invoiceNumber}`
-    });
-  };
+  const navigate = useNavigate();
 
   const handlePayment = () => {
-    toast({
-      title: 'Payment Processing',
-      description: `Redirecting to payment gateway for invoice ${invoice.invoiceNumber}`
-    });
-    // In a real app, this would integrate with Stripe or other payment provider
+    // Mock payment process
+    alert('Payment functionality would be integrated with payment provider (e.g., Stripe)');
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden p-0">
-        <DialogHeader className="sr-only">
-          <DialogTitle>Invoice Details - {invoice.invoiceNumber}</DialogTitle>
-          <DialogDescription>
-            View and manage invoice {invoice.invoiceNumber} for {invoice.clientName}
-          </DialogDescription>
-        </DialogHeader>
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b bg-background">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold">{invoice.invoiceNumber}</h1>
-              <p className="text-sm text-muted-foreground">Invoice Details</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground">Issued</p>
-              <p className="text-2xl font-bold text-primary">
-                <Money amount={invoice.totalAmount} currency={invoice.currency} />
-              </p>
-            </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={onBack}
+            className="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">{invoice.invoiceNumber}</h1>
+            <p className="text-gray-600">Invoice Details</p>
           </div>
         </div>
-        
-        {/* Invoice Content */}
-        <div className="flex-1 overflow-y-auto bg-white">
-          <div className="p-8 space-y-8">
-            {/* Company Header */}
-            <div className="flex justify-between items-start">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-                  <span className="text-primary-foreground font-bold text-lg">DC</span>
+        <div className="flex items-center space-x-4">
+          <StatusBadge status={invoice.status} />
+          <Money amount={invoice.totalAmount} currency={invoice.currency} className="text-xl font-bold" />
+        </div>
+      </div>
+
+      {/* Invoice Content */}
+      <div className="bg-white shadow rounded-lg">
+        <div className="px-6 py-8">
+          {/* Invoice Header */}
+          <div className="flex justify-between items-start mb-8">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">DC</span>
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold">DebtCollect Pro</h2>
-                  <p className="text-muted-foreground">Professional Debt Collection Services</p>
-                  <div className="mt-2 space-y-1 text-sm text-muted-foreground">
-                    <p>123 Business Street</p>
-                    <p>London, SW1A 1AA</p>
-                    <p>United Kingdom</p>
-                    <p>VAT: GB123456789</p>
-                  </div>
+                  <h2 className="text-xl font-bold text-gray-900">DebtCollect Pro</h2>
+                  <p className="text-sm text-gray-600">Professional Debt Collection Services</p>
                 </div>
               </div>
-              
-              <div className="text-right">
-                <h1 className="text-3xl font-bold mb-4">INVOICE</h1>
-                <div className="space-y-1 text-sm">
-                  <div className="flex justify-between gap-8">
-                    <span className="text-muted-foreground">Invoice #:</span>
-                    <span className="font-medium">{invoice.invoiceNumber}</span>
-                  </div>
-                  <div className="flex justify-between gap-8">
-                    <span className="text-muted-foreground">Issue Date:</span>
-                    <span className="font-medium">{format(new Date(invoice.createdAt), 'dd/MM/yyyy')}</span>
-                  </div>
-                  <div className="flex justify-between gap-8">
-                    <span className="text-muted-foreground">Due Date:</span>
-                    <span className="font-medium">{format(new Date(invoice.dueDate), 'dd/MM/yyyy')}</span>
-                  </div>
-                </div>
+              <div className="text-sm text-gray-600">
+                <p>123 Business Street</p>
+                <p>London, SW1A 1AA</p>
+                <p>United Kingdom</p>
+                <p>VAT: GB123456789</p>
               </div>
             </div>
-
-            {/* Bill To Section */}
-            <div>
-              <h3 className="font-semibold text-lg mb-3">Bill To:</h3>
-              <div className="bg-muted/30 rounded-lg p-4">
-                <p className="font-semibold">{invoice.clientName}</p>
-                <p className="text-sm text-muted-foreground">Client ID: {invoice.clientId}</p>
+            <div className="text-right">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">INVOICE</h3>
+              <div className="text-sm text-gray-600 space-y-1">
+                <p><span className="font-medium">Invoice #:</span> {invoice.invoiceNumber}</p>
+                <p><span className="font-medium">Issue Date:</span> {format(new Date(invoice.createdAt), 'dd/MM/yyyy')}</p>
+                <p><span className="font-medium">Due Date:</span> {format(new Date(invoice.dueDate), 'dd/MM/yyyy')}</p>
+                {invoice.paidAt && (
+                  <p><span className="font-medium">Paid Date:</span> {format(new Date(invoice.paidAt), 'dd/MM/yyyy')}</p>
+                )}
               </div>
             </div>
+          </div>
 
-            {/* Related Case Section */}
-            <div>
-              <h3 className="font-semibold text-lg mb-3">Related Case:</h3>
-              <div className="bg-accent/30 rounded-lg p-4">
-                <p className="font-medium text-primary">{invoice.caseName}</p>
-                <p className="text-sm text-muted-foreground">Case reference and details</p>
+          {/* Bill To */}
+          <div className="mb-8">
+            <h4 className="text-lg font-semibold text-gray-900 mb-2">Bill To:</h4>
+            <div className="text-sm text-gray-600">
+              <p className="font-medium">{invoice.clientName}</p>
+              <p>Client ID: {invoice.clientId}</p>
+            </div>
+          </div>
+
+          {/* Related Case */}
+          <div className="mb-8">
+            <h4 className="text-lg font-semibold text-gray-900 mb-2">Related Case:</h4>
+            <div className="text-sm text-gray-600">
+              <button
+                onClick={() => navigate(`/cases/${invoice.caseId}`)}
+                className="text-blue-600 hover:text-blue-800 font-medium"
+              >
+                {invoice.caseName}
+              </button>
+            </div>
+          </div>
+
+          {/* Invoice Items */}
+          <div className="mb-8">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Price</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {invoice.items.map((item, index) => (
+                  <tr key={index}>
+                    <td className="px-4 py-4 text-sm text-gray-900">
+                      <div>
+                        <p className="font-medium">{item.description}</p>
+                        <p className="text-gray-500">Collection handling fee (5%)</p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-sm text-gray-900 text-center">{item.quantity}</td>
+                    <td className="px-4 py-4 text-sm text-gray-900 text-right">
+                      <Money amount={item.unitPrice} currency={invoice.currency} />
+                    </td>
+                    <td className="px-4 py-4 text-sm text-gray-900 text-right font-medium">
+                      <Money amount={item.total} currency={invoice.currency} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Totals */}
+          <div className="flex justify-end mb-8">
+            <div className="w-80 space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Subtotal:</span>
+                <span className="font-medium">
+                  <Money amount={invoice.amount} currency={invoice.currency} />
+                </span>
               </div>
-            </div>
-
-            {/* Invoice Items Table */}
-            <div>
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-b-2">
-                    <TableHead className="font-semibold text-foreground">DESCRIPTION</TableHead>
-                    <TableHead className="font-semibold text-foreground text-center">QTY</TableHead>
-                    <TableHead className="font-semibold text-foreground text-right">UNIT PRICE</TableHead>
-                    <TableHead className="font-semibold text-foreground text-right">TOTAL</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {invoice.items.map((item, index) => (
-                    <TableRow key={index} className="border-b">
-                      <TableCell className="py-4">
-                        <div>
-                          <p className="font-medium">{item.description}</p>
-                          <p className="text-sm text-muted-foreground">Collection handling fee (5%)</p>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-center py-4">{item.quantity}</TableCell>
-                      <TableCell className="text-right py-4">
-                        <Money amount={item.unitPrice} currency={invoice.currency} />
-                      </TableCell>
-                      <TableCell className="text-right py-4 font-medium">
-                        <Money amount={item.total} currency={invoice.currency} />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-
-            {/* Totals Section */}
-            <div className="flex justify-end">
-              <div className="w-80 space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal:</span>
-                  <span className="font-medium">
-                    <Money amount={invoice.amount} currency={invoice.currency} />
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">VAT (20%):</span>
-                  <span className="font-medium">
-                    <Money amount={invoice.vatAmount} currency={invoice.currency} />
-                  </span>
-                </div>
-                <Separator />
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">VAT (20%):</span>
+                <span className="font-medium">
+                  <Money amount={invoice.vatAmount} currency={invoice.currency} />
+                </span>
+              </div>
+              <div className="border-t border-gray-200 pt-3">
                 <div className="flex justify-between text-lg font-bold">
-                  <span>Total:</span>
-                  <span>
+                  <span className="text-gray-900">Total:</span>
+                  <span className="text-gray-900">
                     <Money amount={invoice.totalAmount} currency={invoice.currency} />
                   </span>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Payment Terms */}
-            <div className="bg-muted/30 rounded-lg p-4">
-              <h4 className="font-semibold mb-2">Payment Terms</h4>
-              <p className="text-sm text-muted-foreground">
-                Payment is due within 30 days of invoice date. Late payments may incur additional charges. 
-                For questions regarding this invoice, please contact our billing department.
-              </p>
-            </div>
+          {/* Payment Terms */}
+          <div className="mb-8 p-4 bg-gray-50 rounded-lg">
+            <h4 className="font-medium text-gray-900 mb-2">Payment Terms</h4>
+            <p className="text-sm text-gray-600">
+              Payment is due within 30 days of invoice date. Late payments may incur additional charges.
+              For questions regarding this invoice, please contact our billing department.
+            </p>
+          </div>
 
-            {/* Data Protection Notice */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-semibold mb-2 text-blue-800">Data Protection Notice</h4>
-              <p className="text-sm text-blue-700">
-                This invoice and payment data will be retained for 7 years as required by law. 
-                You have the right to request access to or deletion of your personal data in accordance with GDPR.
-              </p>
-            </div>
+          {/* GDPR Notice */}
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h4 className="font-medium text-blue-900 mb-2">Data Protection Notice</h4>
+            <p className="text-sm text-blue-800">
+              This invoice and payment data will be retained for 7 years as required by law.
+              You have the right to request access to or deletion of your personal data in accordance with GDPR.
+            </p>
           </div>
         </div>
 
-        {/* Footer Actions */}
-        <div className="flex justify-between items-center p-6 border-t bg-muted/20">
-          <Button variant="outline" onClick={handleDownload}>
-            <Download className="h-4 w-4 mr-2" />
+        {/* Actions */}
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+          <button
+            onClick={() => {
+              toast({
+                title: 'Download Started',
+                description: `Downloading invoice ${invoice.invoiceNumber}`
+              });
+            }}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <Download className="w-4 h-4 mr-2" />
             Download PDF
-          </Button>
+          </button>
+          
           {(invoice.status === 'sent' || invoice.status === 'overdue') && (
-            <Button onClick={handlePayment} className="bg-green-600 hover:bg-green-700 text-white">
-              <CreditCard className="h-4 w-4 mr-2" />
+            <button
+              onClick={handlePayment}
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            >
+              <CreditCard className="w-4 h-4 mr-2" />
               Pay Now
-            </Button>
+            </button>
           )}
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }
 
@@ -323,7 +302,7 @@ export default function Invoices() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([]);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
-  const [showInvoiceDialog, setShowInvoiceDialog] = useState(false);
+  const [showInvoiceDetail, setShowInvoiceDetail] = useState(false);
   
   // Filters
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all');
@@ -390,7 +369,7 @@ export default function Invoices() {
 
   const handleViewInvoice = (invoice: Invoice) => {
     setSelectedInvoice(invoice);
-    setShowInvoiceDialog(true);
+    setShowInvoiceDetail(true);
   };
 
   const handleDownloadInvoice = (invoice: Invoice) => {
@@ -441,6 +420,19 @@ export default function Invoices() {
     overdueValue: invoices.filter(i => i.status === 'overdue').reduce((sum, inv) => sum + inv.totalAmount, 0),
     sent: invoices.filter(i => i.status === 'sent').length
   };
+
+  // Show invoice detail view if selected
+  if (showInvoiceDetail && selectedInvoice) {
+    return (
+      <InvoiceDetailView 
+        invoice={selectedInvoice} 
+        onBack={() => {
+          setShowInvoiceDetail(false);
+          setSelectedInvoice(null);
+        }} 
+      />
+    );
+  }
 
   return (
     <div className="container mx-auto py-8 space-y-8">
@@ -690,13 +682,6 @@ export default function Invoices() {
           )}
         </CardContent>
       </Card>
-
-      {/* Enhanced Invoice Detail Dialog */}
-      <InvoiceDetailDialog
-        invoice={selectedInvoice}
-        isOpen={showInvoiceDialog}
-        onOpenChange={setShowInvoiceDialog}
-      />
     </div>
   );
 }
