@@ -140,7 +140,7 @@ class MockDataStore {
       const historyItem: CaseHistoryItem = {
         HistoryId: `history_${event.id}`,
         CaseId: event.caseId,
-        When: event.timestamp,
+        When: event.createdAt,
         WhoUserId: event.userId,
         Type: event.type === 'activity' ? "Activity" : "Note",
         Title: event.title,
