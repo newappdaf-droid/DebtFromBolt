@@ -123,67 +123,77 @@ function InvoiceDetailDialog({
     });
   };
 
+  const handlePayment = () => {
+    toast({
+      title: 'Payment Processing',
+      description: `Redirecting to payment gateway for invoice ${invoice.invoiceNumber}`
+    });
+    // In a real app, this would integrate with Stripe or other payment provider
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
-        <DialogHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <div>
-                <DialogTitle className="text-2xl font-bold">{invoice.invoiceNumber}</DialogTitle>
-                <DialogDescription>Invoice Details</DialogDescription>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <StatusBadge status={invoice.status} />
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground">Issued</p>
-                <p className="text-2xl font-bold">
-                  <Money amount={invoice.totalAmount} currency={invoice.currency} />
-                </p>
-              </div>
+      <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden p-0">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b bg-background">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold">{invoice.invoiceNumber}</h1>
+              <p className="text-sm text-muted-foreground">Invoice Details</p>
             </div>
           </div>
-        </DialogHeader>
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <p className="text-sm text-muted-foreground">Issued</p>
+              <p className="text-2xl font-bold text-primary">
+                <Money amount={invoice.totalAmount} currency={invoice.currency} />
+              </p>
+            </div>
+          </div>
+        </div>
         
-        <ScrollArea className="flex-1 px-6">
-          <div className="space-y-8">
+        {/* Invoice Content */}
+        <div className="flex-1 overflow-y-auto bg-white">
+          <div className="p-8 space-y-8">
             {/* Company Header */}
             <div className="flex justify-between items-start">
               <div className="flex items-start gap-4">
-                <div className="p-3 bg-primary rounded-lg">
-                  <Building2 className="h-8 w-8 text-primary-foreground" />
+                <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+                  <span className="text-primary-foreground font-bold text-lg">DC</span>
                 </div>
                 <div>
                   <h2 className="text-xl font-bold">DebtCollect Pro</h2>
                   <p className="text-muted-foreground">Professional Debt Collection Services</p>
                   <div className="mt-2 space-y-1 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-3 w-3" />
-                      <span>123 Business Street, London, SW1A 1AA, United Kingdom</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-3 w-3" />
-                      <span>VAT: GB123456789</span>
-                    </div>
+                    <p>123 Business Street</p>
+                    <p>London, SW1A 1AA</p>
+                    <p>United Kingdom</p>
+                    <p>VAT: GB123456789</p>
                   </div>
                 </div>
               </div>
               
               <div className="text-right">
-                <h1 className="text-3xl font-bold">INVOICE</h1>
-                <div className="mt-2 space-y-1 text-sm">
-                  <p><span className="text-muted-foreground">Invoice #:</span> {invoice.invoiceNumber}</p>
-                  <p><span className="text-muted-foreground">Issue Date:</span> {format(new Date(invoice.createdAt), 'dd/MM/yyyy')}</p>
-                  <p><span className="text-muted-foreground">Due Date:</span> {format(new Date(invoice.dueDate), 'dd/MM/yyyy')}</p>
+                <h1 className="text-3xl font-bold mb-4">INVOICE</h1>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between gap-8">
+                    <span className="text-muted-foreground">Invoice #:</span>
+                    <span className="font-medium">{invoice.invoiceNumber}</span>
+                  </div>
+                  <div className="flex justify-between gap-8">
+                    <span className="text-muted-foreground">Issue Date:</span>
+                    <span className="font-medium">{format(new Date(invoice.createdAt), 'dd/MM/yyyy')}</span>
+                  </div>
+                  <div className="flex justify-between gap-8">
+                    <span className="text-muted-foreground">Due Date:</span>
+                    <span className="font-medium">{format(new Date(invoice.dueDate), 'dd/MM/yyyy')}</span>
+                  </div>
                 </div>
               </div>
             </div>
-
-            <Separator />
 
             {/* Bill To Section */}
             <div>
@@ -279,17 +289,20 @@ function InvoiceDetailDialog({
               </p>
             </div>
           </div>
-        </ScrollArea>
+        </div>
 
         {/* Footer Actions */}
-        <div className="flex justify-between items-center pt-4 border-t">
+        <div className="flex justify-between items-center p-6 border-t bg-muted/20">
           <Button variant="outline" onClick={handleDownload}>
             <Download className="h-4 w-4 mr-2" />
             Download PDF
           </Button>
-          <Button className="bg-green-600 hover:bg-green-700 text-white">
-            Pay Now
-          </Button>
+          {(invoice.status === 'sent' || invoice.status === 'overdue') && (
+            <Button onClick={handlePayment} className="bg-green-600 hover:bg-green-700 text-white">
+              <CreditCard className="h-4 w-4 mr-2" />
+              Pay Now
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>
