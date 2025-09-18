@@ -107,13 +107,13 @@ class MockDataStore {
       const finance: CaseFinance = {
         CaseId: mockCase.id,
         Currency: mockCase.currency as "EUR" | "USD" | "GBP",
-        Principal: mockCase.originalAmount,
+        Principal: mockCase.originalAmount ?? 0,
         Fees: mockCase.fees || 0,
         Penalties: mockCase.penalties || 0,
         Interest: mockCase.interest || 0,
         PaymentsTotal: mockCase.paidAmount || 0,
         NotAllocatedTotal: 0,
-        OpenToPay: mockCase.outstandingAmount,
+        OpenToPay: mockCase.outstandingAmount ?? 0,
         UpdatedAt: new Date().toISOString()
       };
       
