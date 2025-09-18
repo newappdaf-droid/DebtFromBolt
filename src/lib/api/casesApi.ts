@@ -1,6 +1,7 @@
 // Professional Cases API Adapter for B2B Debt Collection Platform
 // Mock implementation with .NET-ready contracts and PascalCase DTOs
 
+import { mockCases, mockEvents, mockMessages, mockDocuments, mockApprovals, mockInvoices } from '@/lib/mockData';
 import {
   CaseSummary,
   CaseHeader,
@@ -55,163 +56,111 @@ class MockDataStore {
   }
 
   private initializeMockData() {
-    // Generate 200+ diverse cases
-    for (let i = 1; i <= 250; i++) {
-      const caseId = `case_${i.toString().padStart(6, '0')}`;
-      const phases = ["Soft", "Field", "Legal", "Bailiff", "Closed"] as const;
-      const zones = ["PreLegal", "Legal", "Bailiff"] as const;
-      const statuses = ["PendingAcceptance", "Active", "Refused", "Closed"] as const;
-      const priorities = ["Low", "Medium", "High"] as const;
-      const caseTypes = ["B2C", "B2B"] as const;
-      
-      const phase = phases[Math.floor(Math.random() * phases.length)];
-      const zone = phase === "Closed" ? zones[0] : zones[Math.floor(Math.random() * zones.length)];
-      const status = phase === "Closed" ? "Closed" : statuses[Math.floor(Math.random() * statuses.length)];
-      
-      const openedAt = new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString();
-      const acceptedAt = status !== "PendingAcceptance" ? new Date(new Date(openedAt).getTime() + Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString() : undefined;
-      const closedAt = status === "Closed" ? new Date(new Date(acceptedAt || openedAt).getTime() + Math.random() * 180 * 24 * 60 * 60 * 1000).toISOString() : undefined;
-
-      const labels = [];
-      const availableLabels = ["HighValue", "Dispute", "VIP", "Elderly", "Vulnerable", "Commercial", "Residential"];
-      for (let j = 0; j < Math.floor(Math.random() * 3); j++) {
-        const label = availableLabels[Math.floor(Math.random() * availableLabels.length)];
-        if (!labels.includes(label)) labels.push(label);
-      }
-
+    // Map existing mock cases to CaseHeader format
+    mockCases.forEach(mockCase => {
       const caseHeader: CaseHeader = {
-        CaseId: caseId,
-        CaseNumber: `CN${i.toString().padStart(8, '0')}`,
-        Phase: phase,
-        Zone: zone,
-        Status: status,
-        AssignedToUserId: Math.random() > 0.3 ? `agent_${Math.floor(Math.random() * 5) + 1}` : undefined,
-        Priority: priorities[Math.floor(Math.random() * priorities.length)],
-        OpenedAt: openedAt,
-        AcceptedAt: acceptedAt,
-        ClosedAt: closedAt,
-        Labels: labels,
-        PortfolioId: `portfolio_${Math.floor(Math.random() * 10) + 1}`,
-        ClientId: `client_${Math.floor(Math.random() * 5) + 1}`,
-        CreditorId: `creditor_${Math.floor(Math.random() * 3) + 1}`,
-        SendingPartnerId: Math.random() > 0.5 ? `partner_${Math.floor(Math.random() * 3) + 1}` : undefined,
-        DebtorId: `debtor_${i}`,
-        CaseType: caseTypes[Math.floor(Math.random() * caseTypes.length)],
-        ProcessType: Math.random() > 0.5 ? "Standard" : "Express",
-        CommissionPct: Math.random() > 0.5 ? Math.floor(Math.random() * 30) + 10 : undefined
+        CaseId: mockCase.id,
+        CaseNumber: mockCase.caseNumber,
+        Phase: mockCase.phase as "Soft" | "Field" | "Legal" | "Bailiff" | "Closed",
+        Zone: mockCase.zone as "PreLegal" | "Legal" | "Bailiff",
+        Status: mockCase.status as "PendingAcceptance" | "Active" | "Refused" | "Closed",
+        AssignedToUserId: mockCase.assignedTo,
+        Priority: mockCase.priority as "Low" | "Medium" | "High",
+        OpenedAt: mockCase.createdAt,
+        AcceptedAt: mockCase.acceptedAt,
+        ClosedAt: mockCase.closedAt,
+        Labels: mockCase.labels || [],
+        PortfolioId: mockCase.portfolioId,
+        ClientId: mockCase.clientId,
+        CreditorId: mockCase.creditorId,
+        DebtorId: mockCase.debtorId,
+        CaseType: mockCase.type as "B2C" | "B2B",
+        ProcessType: "Standard",
+        CommissionPct: mockCase.commissionRate
       };
-
+      
       this.cases.push(caseHeader);
 
-      // Generate finance data
-      const principal = Math.floor(Math.random() * 50000) + 1000;
-      const fees = Math.floor(principal * 0.15);
-      const penalties = Math.floor(principal * 0.05);
-      const interest = Math.floor(principal * 0.08);
-      const paymentsTotal = status === "Closed" ? principal + fees : Math.floor(Math.random() * principal * 0.8);
-      
+      // Create corresponding finance data
       const finance: CaseFinance = {
-        CaseId: caseId,
-        Currency: ["EUR", "USD", "GBP"][Math.floor(Math.random() * 3)] as "EUR" | "USD" | "GBP",
-        Principal: principal,
-        Fees: fees,
-        Penalties: penalties,
-        Interest: interest,
-        PaymentsTotal: paymentsTotal,
-        NotAllocatedTotal: Math.floor(Math.random() * 100),
-        OpenToPay: Math.max(0, principal + fees + penalties + interest - paymentsTotal),
+        CaseId: mockCase.id,
+        Currency: mockCase.currency as "EUR" | "USD" | "GBP",
+        Principal: mockCase.originalAmount,
+        Fees: mockCase.fees || 0,
+        Penalties: mockCase.penalties || 0,
+        Interest: mockCase.interest || 0,
+        PaymentsTotal: mockCase.paidAmount || 0,
+        NotAllocatedTotal: 0,
+        OpenToPay: mockCase.outstandingAmount,
         UpdatedAt: new Date().toISOString()
       };
-
-      this.finances.push(finance);
-
-      // Generate activities (2-8 per case)
-      const activityCount = Math.floor(Math.random() * 7) + 2;
-      const activityTypes = ["Call", "SMS", "Email", "Visit", "Verification", "Dispute", "PTP", "Other"] as const;
-      const outcomes = ["Reached", "NoAnswer", "WrongNumber", "Paid", "Promise", "BrokenPromise", "DisputeOpen", "DisputeClosed", "Other"] as const;
       
-      for (let j = 0; j < activityCount; j++) {
-        const activityDate = new Date(new Date(openedAt).getTime() + j * 7 * 24 * 60 * 60 * 1000);
-        const dueAt = Math.random() > 0.7 ? new Date(activityDate.getTime() + Math.random() * 14 * 24 * 60 * 60 * 1000).toISOString() : undefined;
-        
+      this.finances.push(finance);
+    });
+
+    // Map existing mock events to activities and history
+    mockEvents.forEach(event => {
+      if (event.type === 'activity') {
         const activity: CaseActivity = {
-          ActivityId: `activity_${caseId}_${j}`,
-          CaseId: caseId,
-          Type: activityTypes[Math.floor(Math.random() * activityTypes.length)],
-          Outcome: outcomes[Math.floor(Math.random() * outcomes.length)],
-          Note: `Activity note for ${activityTypes[Math.floor(Math.random() * activityTypes.length)].toLowerCase()} action`,
-          DueAt: dueAt,
-          CreatedBy: caseHeader.AssignedToUserId || "system",
-          CreatedAt: activityDate.toISOString()
+          ActivityId: event.id,
+          CaseId: event.caseId,
+          Type: event.activityType as "Call" | "SMS" | "Email" | "Visit" | "Verification" | "Dispute" | "PTP" | "Other",
+          Outcome: event.outcome as "Reached" | "NoAnswer" | "WrongNumber" | "Paid" | "Promise" | "BrokenPromise" | "DisputeOpen" | "DisputeClosed" | "Other",
+          Note: event.description,
+          DueAt: event.dueDate,
+          CreatedBy: event.userId,
+          CreatedAt: event.timestamp
         };
-        
         this.activities.push(activity);
       }
 
-      // Generate history items
-      const historyTypes = ["Created", "FieldChanged", "Assignment", "Message", "Activity", "Payment", "Document", "Escalation", "PhaseChange", "Note"] as const;
-      for (let j = 0; j < Math.floor(Math.random() * 10) + 5; j++) {
-        const historyDate = new Date(new Date(openedAt).getTime() + j * 3 * 24 * 60 * 60 * 1000);
-        
-        const historyItem: CaseHistoryItem = {
-          HistoryId: `history_${caseId}_${j}`,
-          CaseId: caseId,
-          When: historyDate.toISOString(),
-          WhoUserId: caseHeader.AssignedToUserId || "system",
-          Type: historyTypes[Math.floor(Math.random() * historyTypes.length)],
-          Title: `History event ${j + 1}`,
-          Body: `Detailed description of history event ${j + 1}`,
-          RefTable: Math.random() > 0.5 ? "activities" : undefined,
-          RefId: Math.random() > 0.5 ? `ref_${j}` : undefined
-        };
-        
-        this.history.push(historyItem);
-      }
-
-      // Generate some payments for closed cases
-      if (status === "Closed" && Math.random() > 0.3) {
-        const paymentCount = Math.floor(Math.random() * 3) + 1;
-        for (let j = 0; j < paymentCount; j++) {
-          const paymentDate = new Date(new Date(acceptedAt || openedAt).getTime() + j * 30 * 24 * 60 * 60 * 1000);
-          
-          const payment: Payment = {
-            PaymentId: `payment_${caseId}_${j}`,
-            CaseId: caseId,
-            Amount: Math.floor(paymentsTotal / paymentCount),
-            Currency: finance.Currency,
-            PaidAt: paymentDate.toISOString(),
-            Method: ["Bank", "Cash", "Card", "Other"][Math.floor(Math.random() * 4)] as "Bank" | "Cash" | "Card" | "Other",
-            ExternalRef: `EXT${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-            CreatedAt: paymentDate.toISOString()
-          };
-          
-          this.payments.push(payment);
-        }
-      }
-    }
-
-    // Generate some escalation requests
-    for (let i = 0; i < 30; i++) {
-      const caseId = this.cases[Math.floor(Math.random() * this.cases.length)].CaseId;
-      const phases = ["Soft", "Field", "Legal", "Bailiff"] as const;
-      const fromPhase = phases[Math.floor(Math.random() * phases.length)];
-      const toPhaseIndex = phases.indexOf(fromPhase) + 1;
-      const toPhase = toPhaseIndex < phases.length ? phases[toPhaseIndex] : "Closed";
-      
-      const escalation: EscalationRequest = {
-        EscalationId: `escalation_${i}`,
-        CaseId: caseId,
-        FromPhase: fromPhase,
-        ToPhase: toPhase as "Soft" | "Field" | "Legal" | "Bailiff" | "Closed",
-        RequestedBy: `agent_${Math.floor(Math.random() * 5) + 1}`,
-        Reason: `Escalation reason for case ${caseId}`,
-        Status: ["Pending", "Approved", "Rejected"][Math.floor(Math.random() * 3)] as "Pending" | "Approved" | "Rejected",
-        DecidedBy: Math.random() > 0.5 ? "admin_1" : undefined,
-        DecidedAt: Math.random() > 0.5 ? new Date().toISOString() : undefined
+      // Add to history
+      const historyItem: CaseHistoryItem = {
+        HistoryId: `history_${event.id}`,
+        CaseId: event.caseId,
+        When: event.timestamp,
+        WhoUserId: event.userId,
+        Type: event.type === 'activity' ? "Activity" : "Note",
+        Title: event.title,
+        Body: event.description,
+        RefTable: event.type === 'activity' ? "activities" : undefined,
+        RefId: event.type === 'activity' ? event.id : undefined
       };
-      
-      this.escalations.push(escalation);
-    }
+      this.history.push(historyItem);
+    });
+
+    // Map existing mock messages
+    mockMessages.forEach(message => {
+      const caseMessage: CaseMessage = {
+        MessageId: message.id,
+        CaseId: message.caseId,
+        ThreadId: `thread_${message.caseId}`,
+        FromUserId: message.fromUserId,
+        ToUserId: message.toUserId,
+        Body: message.content,
+        HasAttachments: message.attachments && message.attachments.length > 0,
+        CreatedAt: message.timestamp
+      };
+      this.messages.push(caseMessage);
+    });
+
+    // Map existing mock documents
+    mockDocuments.forEach(doc => {
+      const caseDocument: CaseDocument = {
+        DocumentId: doc.id,
+        CaseId: doc.caseId,
+        Type: doc.type as "Contract" | "Invoice" | "Receipt" | "Legal" | "Other",
+        FileName: doc.name,
+        MimeType: doc.mimeType,
+        StorageKey: `documents/${doc.caseId}/${doc.name}`,
+        Size: doc.size,
+        Version: doc.version,
+        UploadedBy: doc.uploadedBy,
+        UploadedAt: doc.uploadedAt,
+        Hash: doc.hash || Math.random().toString(36).substring(2, 15)
+      };
+      this.documents.push(caseDocument);
+    });
   }
 
   // Getters
