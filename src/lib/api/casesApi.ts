@@ -58,25 +58,47 @@ class MockDataStore {
   private initializeMockData() {
     // Map existing mock cases to CaseHeader format
     mockCases.forEach(mockCase => {
+      // Map status to Phase with proper defaults
+      let phase: "Soft" | "Field" | "Legal" | "Bailiff" | "Closed";
+      let status: "PendingAcceptance" | "Active" | "Refused" | "Closed";
+      
+      switch (mockCase.status) {
+        case 'active':
+          phase = "Soft";
+          status = "Active";
+          break;
+        case 'pending':
+          phase = "Soft";
+          status = "PendingAcceptance";
+          break;
+        case 'closed':
+          phase = "Closed";
+          status = "Closed";
+          break;
+        default:
+          phase = "Soft";
+          status = "PendingAcceptance";
+      }
+      
       const caseHeader: CaseHeader = {
         CaseId: mockCase.id,
-        CaseNumber: mockCase.caseNumber,
-        Phase: mockCase.phase as "Soft" | "Field" | "Legal" | "Bailiff" | "Closed",
-        Zone: mockCase.zone as "PreLegal" | "Legal" | "Bailiff",
-        Status: mockCase.status as "PendingAcceptance" | "Active" | "Refused" | "Closed",
-        AssignedToUserId: mockCase.assignedTo,
-        Priority: mockCase.priority as "Low" | "Medium" | "High",
+        CaseNumber: mockCase.caseNumber || `CN${mockCase.id.slice(-8)}`,
+        Phase: phase,
+        Zone: (mockCase.zone as "PreLegal" | "Legal" | "Bailiff") || "PreLegal",
+        Status: status,
+        AssignedToUserId: mockCase.assignedTo || undefined,
+        Priority: (mockCase.priority as "Low" | "Medium" | "High") || "Medium",
         OpenedAt: mockCase.createdAt,
         AcceptedAt: mockCase.acceptedAt,
         ClosedAt: mockCase.closedAt,
         Labels: mockCase.labels || [],
-        PortfolioId: mockCase.portfolioId,
-        ClientId: mockCase.clientId,
-        CreditorId: mockCase.creditorId,
-        DebtorId: mockCase.debtorId,
-        CaseType: mockCase.type as "B2C" | "B2B",
+        PortfolioId: mockCase.portfolioId || `portfolio_${mockCase.id.slice(0, 8)}`,
+        ClientId: mockCase.clientId || `client_${mockCase.id.slice(0, 8)}`,
+        CreditorId: mockCase.creditorId || undefined,
+        DebtorId: mockCase.debtorId || `debtor_${mockCase.id.slice(0, 8)}`,
+        CaseType: (mockCase.type as "B2C" | "B2B") || "B2C",
         ProcessType: "Standard",
-        CommissionPct: mockCase.commissionRate
+        CommissionPct: mockCase.commissionRate || 0
       };
       
       this.cases.push(caseHeader);
