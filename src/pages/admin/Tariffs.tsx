@@ -54,6 +54,7 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from '@/hooks/use-toast';
 import { Money } from '@/components/ui/money';
 
+import { StatusBadge } from '@/components/ui/status-badge';
 import type { Tariff, TariffTier } from '@/types';
 
 const mockTariffs: Tariff[] = [
