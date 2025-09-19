@@ -409,7 +409,7 @@ export default function Cases() {
                             value={savedViewName}
                             onChange={(e) => setSavedViewName(e.target.value)}
                             placeholder="Enter view name..."
-                    <TableCell colSpan={11} className="text-center py-8">
+                          />
                         </div>
                       </div>
                       <DialogFooter>
@@ -551,19 +551,19 @@ export default function Cases() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-12">
+                <TableCell colSpan={11} className="text-center py-12">
                   <div className="text-muted-foreground">Loading cases...</div>
                 </TableCell>
               </TableRow>
             ) : error ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-12">
+                <TableCell colSpan={11} className="text-center py-12">
                   <div className="text-destructive">Failed to load cases: {error}</div>
                 </TableCell>
               </TableRow>
-                    <TableCell colSpan={11} className="text-center py-8">
+            ) : paginatedCases.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-12">
+                <TableCell colSpan={11} className="text-center py-12">
                   <div className="flex flex-col items-center gap-2">
                     <FileText className="h-12 w-12 text-muted-foreground/50" />
                     <p className="text-muted-foreground">
@@ -589,10 +589,10 @@ export default function Cases() {
                       <Checkbox
                         checked={selectedCases.includes(case_.CaseId)}
                         onCheckedChange={() => toggleCaseSelection(case_.CaseId)}
-                        <TableCell>
+                      />
                     </TableCell>
                     <TableCell className="font-medium">
-                            className="font-medium text-primary hover:underline"
+                      <Link
                         to={`/cases/${case_.CaseId}`}
                         className="text-primary hover:underline"
                       >
@@ -625,13 +625,13 @@ export default function Cases() {
                           {case_.Priority}
                         </Badge>
                       )}
-                          <span className="font-mono text-sm">€{Math.floor(Math.random() * 50000 + 1000).toLocaleString()}</span>
+                    </TableCell>
                     <TableCell className="text-right">
                       <span className="font-mono">€{Math.floor(Math.random() * 50000 + 1000).toLocaleString()}</span>
                     </TableCell>
                     <TableCell>
                       {case_.AssignedToUserId ? (
-                            <span className="text-xs text-muted-foreground italic">Unassigned</span>
+                        <span className="text-sm">Agent {case_.AssignedToUserId}</span>
                       ) : (
                         <span className="text-sm text-muted-foreground italic">Unassigned</span>
                       )}
@@ -673,7 +673,7 @@ export default function Cases() {
                   </TableRow>
                 );
               })
-                    <TableCell colSpan={11} className="text-center py-8">
+            )}
           </TableBody>
         </Table>
       </Card>
