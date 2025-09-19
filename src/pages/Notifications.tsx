@@ -507,11 +507,9 @@ export default function Notifications() {
                       
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs capitalize">
-                            {notification.type.replace('_', ' ')}
-                          </Badge>
+                          <StatusBadge status={notification.type} size="sm" maxWidth="100px" truncate={true} />
                           {notification.relatedEntityType && (
-                            <Badge variant="secondary" className="text-xs">
+                            <Badge variant="secondary" size="sm" maxWidth="80px" truncate={true}>
                               {notification.relatedEntityType}
                             </Badge>
                           )}

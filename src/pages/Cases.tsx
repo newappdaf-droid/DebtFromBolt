@@ -600,30 +600,20 @@ export default function Cases() {
                       </Link>
                     </TableCell>
                     <TableCell>
-                      <Badge className={phaseConfig[case_.Phase].color}>
-                        <PhaseIcon className="h-3 w-3 mr-1" />
-                        {phaseConfig[case_.Phase].label}
-                      </Badge>
+                      <div className="flex items-center gap-1">
+                        <PhaseIcon className="h-3 w-3 text-muted-foreground" />
+                        <StatusBadge status={case_.Phase} size="sm" maxWidth="100px" truncate={true} />
+                      </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className={zoneConfig[case_.Zone].color}>
-                        {zoneConfig[case_.Zone].label}
-                      </Badge>
+                      <StatusBadge status={case_.Zone} size="sm" maxWidth="80px" />
                     </TableCell>
                     <TableCell>
-                      <Badge className={statusConfig[case_.Status].color}>
-                        {statusConfig[case_.Status].label}
-                      </Badge>
+                      <StatusBadge status={case_.Status} size="sm" maxWidth="70px" />
                     </TableCell>
                     <TableCell>
                       {case_.Priority && (
-                        <Badge variant="outline" className={
-                          case_.Priority === 'High' ? 'border-red-500 text-red-500' :
-                          case_.Priority === 'Medium' ? 'border-yellow-500 text-yellow-500' :
-                          'border-green-500 text-green-500'
-                        }>
-                          {case_.Priority}
-                        </Badge>
+                        <StatusBadge status={case_.Priority.toLowerCase()} size="sm" maxWidth="60px" />
                       )}
                     </TableCell>
                     <TableCell className="text-right">
@@ -631,7 +621,9 @@ export default function Cases() {
                     </TableCell>
                     <TableCell>
                       {case_.AssignedToUserId ? (
-                        <span className="text-sm">Agent {case_.AssignedToUserId}</span>
+                        <span className="text-sm truncate max-w-[100px] block" title={`Agent ${case_.AssignedToUserId}`}>
+                          Agent {case_.AssignedToUserId}
+                        </span>
                       ) : (
                         <span className="text-sm text-muted-foreground italic">Unassigned</span>
                       )}
@@ -639,19 +631,23 @@ export default function Cases() {
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
                         {case_.Labels.slice(0, 2).map((label) => (
-                          <Badge key={label} variant="outline" className="text-xs">
+                          <Badge key={label} variant="outline" size="sm" truncate={true} maxWidth="60px">
                             {label}
                           </Badge>
                         ))}
                         {case_.Labels.length > 2 && (
-                          <Badge variant="outline" className="text-xs">
+                          <Badge variant="outline" size="sm">
                             +{case_.Labels.length - 2}
                           </Badge>
                         )}
                       </div>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {new Date(case_.OpenedAt).toLocaleDateString('en-GB')}
+                      {new Date(case_.OpenedAt).toLocaleDateString('en-GB', { 
+                        day: '2-digit', 
+                        month: '2-digit', 
+                        year: '2-digit' 
+                      })}
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>

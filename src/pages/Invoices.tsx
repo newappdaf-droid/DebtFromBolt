@@ -614,20 +614,24 @@ export default function Invoices() {
                     <TableRow key={invoice.id} className="hover:bg-muted/30 cursor-pointer" onClick={() => handleViewInvoice(invoice)}>
                       <TableCell>
                         <div>
-                          <p className="font-medium text-primary">{invoice.invoiceNumber}</p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="font-medium text-primary text-sm">{invoice.invoiceNumber}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
                             Issued {format(new Date(invoice.createdAt), 'dd/MM/yyyy')}
                           </p>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div>
-                          <p className="font-medium">{invoice.caseName}</p>
-                          <p className="text-xs text-muted-foreground">Case reference</p>
+                          <p className="font-medium text-sm truncate max-w-[200px]" title={invoice.caseName}>
+                            {invoice.caseName}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-0.5">Case reference</p>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <p className="font-medium">{invoice.clientName}</p>
+                        <p className="font-medium text-sm truncate max-w-[150px]" title={invoice.clientName}>
+                          {invoice.clientName}
+                        </p>
                       </TableCell>
                       <TableCell className="text-right">
                         <div>
@@ -640,13 +644,13 @@ export default function Invoices() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <StatusBadge status={invoice.status} />
+                        <StatusBadge status={invoice.status} size="sm" maxWidth="100px" />
                       </TableCell>
                       <TableCell>
-                        <p className="text-sm font-medium">{format(new Date(invoice.dueDate), 'dd/MM/yyyy')}</p>
+                        <p className="text-sm font-medium">{format(new Date(invoice.dueDate), 'dd/MM/yy')}</p>
                         {invoice.paidAt && (
                           <p className="text-xs text-success">
-                            Paid {format(new Date(invoice.paidAt), 'dd/MM/yyyy')}
+                            Paid {format(new Date(invoice.paidAt), 'dd/MM/yy')}
                           </p>
                         )}
                       </TableCell>

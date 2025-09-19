@@ -688,46 +688,38 @@ export default function GdprRequests() {
                       <tr key={request.id} className="border-b hover:bg-muted/30 transition-colors">
                         <td className="py-2 px-3">
                           <div className="flex items-center gap-2">
-                            <div className={`p-1.5 rounded ${request.type === 'SAR' ? 'bg-warning/10' : 'bg-destructive/10'}`}>
-                              <TypeIcon className={`h-4 w-4 ${request.type === 'SAR' ? 'text-warning' : 'text-destructive'}`} />
+                            <div className={`p-1 rounded ${request.type === 'SAR' ? 'bg-blue-50' : 'bg-red-50'}`}>
+                              <TypeIcon className={`h-3 w-3 ${request.type === 'SAR' ? 'text-blue-600' : 'text-red-600'}`} />
                             </div>
-                            <span className="font-medium text-xs">
-                              {request.type}
-                            </span>
+                            <StatusBadge status={request.type} size="sm" maxWidth="80px" />
                           </div>
                         </td>
                         <td className="py-2 px-3">
                           <div>
-                            <p className="font-medium text-sm">{request.dataSubject}</p>
+                            <p className="font-medium text-sm truncate max-w-[150px]" title={request.dataSubject}>
+                              {request.dataSubject}
+                            </p>
                             {request.dataSubjectEmail && (
-                              <p className="text-xs text-muted-foreground">{request.dataSubjectEmail}</p>
+                              <p className="text-xs text-muted-foreground truncate max-w-[150px]" title={request.dataSubjectEmail}>
+                                {request.dataSubjectEmail}
+                              </p>
                             )}
                           </div>
                         </td>
                         <td className="py-2 px-3">
-                          <Badge 
-                            variant={
-                              request.status === 'completed' ? 'default' :
-                              request.status === 'processing' ? 'secondary' :
-                              request.status === 'pending' ? 'outline' : 'destructive'
-                            }
-                            className={
-                              request.status === 'processing' ? 'bg-warning/10 text-warning border-warning' : ''
-                            }
-                          >
-                            {request.status === 'processing' ? 'In Progress' : 
-                             request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                          </Badge>
+                          <StatusBadge status={request.status} size="sm" maxWidth="90px" />
                         </td>
                         <td className="py-2 px-3">
                           <div className="text-xs">
-                            <p className="text-sm">{format(new Date(request.createdAt), 'dd/MM/yyyy')}</p>
-                            <p className="text-muted-foreground">by {request.requestedByName}</p>
+                            <p className="text-sm">{format(new Date(request.createdAt), 'dd/MM/yy')}</p>
+                            <p className="text-muted-foreground truncate max-w-[100px]" title={request.requestedByName}>
+                              by {request.requestedByName}
+                            </p>
                           </div>
                         </td>
                         <td className="py-2 px-3">
                           <div className="text-xs">
-                            <p className="text-sm">{format(new Date(request.dueDate), 'dd/MM/yyyy')}</p>
+                            <p className="text-sm">{format(new Date(request.dueDate), 'dd/MM/yy')}</p>
                             {isOverdue && (
                               <p className="text-destructive font-medium text-xs">Overdue</p>
                             )}

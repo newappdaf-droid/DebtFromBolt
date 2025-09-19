@@ -602,17 +602,23 @@ export default function Approvals() {
                         <div>
                           <button
                             onClick={() => navigate(`/cases/${approval.caseId}`)}
-                            className="font-medium text-primary hover:text-primary/80 hover:underline text-left"
+                            className="font-medium text-primary hover:text-primary/80 hover:underline text-left text-sm truncate max-w-[200px] block"
+                            title={approval.caseName}
                           >
                             {approval.caseName}
                           </button>
-                          <p className="text-xs text-muted-foreground line-clamp-1">{approval.description}</p>
+                          <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5 max-w-[200px]" title={approval.description}>
+                            {approval.description}
+                          </p>
                         </div>
                       </td>
                       <td className="px-3 py-2">
-                        <Badge className={typeConfig[approval.type as keyof typeof typeConfig]?.color || 'bg-gray-100 text-gray-800'}>
-                          {typeConfig[approval.type as keyof typeof typeConfig]?.label || approval.type}
-                        </Badge>
+                        <StatusBadge 
+                          status={approval.type} 
+                          size="sm" 
+                          maxWidth="120px"
+                          truncate={true}
+                        />
                       </td>
                       <td className="px-3 py-2">
                         <div className="font-medium">
@@ -620,14 +626,14 @@ export default function Approvals() {
                         </div>
                       </td>
                       <td className="px-3 py-2">
-                        <Badge className={statusConfig[approval.state].color}>
-                          {statusConfig[approval.state].label}
-                        </Badge>
+                        <StatusBadge status={approval.state} size="sm" maxWidth="80px" />
                       </td>
                       <td className="px-3 py-2">
                         <div className="text-xs">
-                          <p className="text-sm">{format(new Date(approval.createdAt), 'dd/MM/yyyy')}</p>
-                          <p className="text-muted-foreground">by {approval.requestedByName}</p>
+                          <p className="text-sm">{format(new Date(approval.createdAt), 'dd/MM/yy')}</p>
+                          <p className="text-muted-foreground truncate max-w-[100px]" title={approval.requestedByName}>
+                            by {approval.requestedByName}
+                          </p>
                         </div>
                       </td>
                       <td className="px-3 py-2 text-right">
