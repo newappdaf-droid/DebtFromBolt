@@ -595,14 +595,12 @@ export default function RetentionPolicy() {
                             <h3 className="font-semibold mb-1">{rule.name}</h3>
                             <p className="text-xs text-muted-foreground mb-2">{rule.description}</p>
                             <div className="flex items-center gap-2">
-                              <Badge variant={rule.isActive ? 'default' : 'secondary'}>
-                                {rule.isActive ? 'Active' : 'Inactive'}
-                              </Badge>
-                              <Badge variant="outline">
+                              <StatusBadge status={rule.isActive ? 'active' : 'inactive'} size="sm" maxWidth="70px" />
+                              <Badge variant="outline" size="sm" maxWidth="100px" truncate={true}>
                                 {dataTypeConfig[rule.dataType].label}
                               </Badge>
                               {rule.autoDelete && (
-                                <Badge variant="outline" className="border-destructive text-destructive">
+                                <Badge variant="rejected" size="sm" maxWidth="80px">
                                   Auto-Delete
                                 </Badge>
                               )}
@@ -713,7 +711,7 @@ export default function RetentionPolicy() {
                         <TableRow key={schedule.id}>
                           <TableCell className="font-medium">{schedule.ruleName}</TableCell>
                           <TableCell>
-                            <Badge variant="outline" className="capitalize">
+                            <Badge variant="outline" size="sm" className="capitalize" maxWidth="100px" truncate={true}>
                               {schedule.dataType.replace('_', ' ')}
                             </Badge>
                           </TableCell>
@@ -727,21 +725,14 @@ export default function RetentionPolicy() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge 
-                              variant={
-                                schedule.status === 'completed' ? 'default' :
-                                schedule.status === 'failed' ? 'destructive' :
-                                schedule.status === 'processing' ? 'secondary' : 'outline'
-                              }
-                            >
-                              {schedule.status === 'processing' && (
-                                <div className="flex items-center">
-                                  <div className="animate-spin h-3 w-3 border border-current border-t-transparent rounded-full mr-2" />
-                                  Processing
-                                </div>
-                              )}
-                              {schedule.status !== 'processing' && schedule.status}
-                            </Badge>
+                            {schedule.status === 'processing' ? (
+                              <div className="flex items-center gap-1">
+                                <div className="animate-spin h-3 w-3 border border-current border-t-transparent rounded-full" />
+                                <StatusBadge status="processing" size="sm" maxWidth="80px" />
+                              </div>
+                            ) : (
+                              <StatusBadge status={schedule.status} size="sm" maxWidth="80px" />
+                            )}
                           </TableCell>
                           <TableCell className="text-right">
                             {schedule.status === 'pending' && (
