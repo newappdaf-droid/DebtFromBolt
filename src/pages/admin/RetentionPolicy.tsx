@@ -67,6 +67,7 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { toast } from '@/hooks/use-toast';
 
+import { StatusBadge } from '@/components/ui/status-badge';
 interface RetentionRule {
   id: string;
   name: string;
