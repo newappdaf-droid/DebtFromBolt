@@ -511,10 +511,8 @@ export default function Tariffs() {
                       <h3 className="font-semibold mb-1">{tariff.name}</h3>
                       <p className="text-xs text-muted-foreground mb-2">{tariff.description}</p>
                       <div className="flex items-center gap-2">
-                        <Badge variant={tariff.isActive ? 'default' : 'secondary'}>
-                          {tariff.isActive ? 'Active' : 'Inactive'}
-                        </Badge>
-                        <Badge variant="outline" className="capitalize">
+                        <StatusBadge status={tariff.isActive ? 'active' : 'inactive'} size="sm" maxWidth="70px" />
+                        <Badge variant="outline" size="sm" className="capitalize" maxWidth="80px" truncate={true}>
                           {tariff.type}
                         </Badge>
                       </div>

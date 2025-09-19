@@ -624,15 +624,13 @@ export default function Templates() {
                           </p>
                         )}
                         <div className="flex items-center gap-2 mb-2">
-                          <Badge variant={template.isActive ? 'default' : 'secondary'}>
-                            {template.isActive ? 'Active' : 'Inactive'}
-                          </Badge>
-                          <Badge variant="outline" className="capitalize">
+                          <StatusBadge status={template.isActive ? 'active' : 'inactive'} size="sm" maxWidth="70px" />
+                          <Badge variant="outline" size="sm" className="capitalize" maxWidth="60px" truncate={true}>
                             {channelConfig[template.channel].label}
                           </Badge>
                           {template.variables && template.variables.length > 0 && (
-                            <Badge variant="outline">
-                              <Variable className="h-3 w-3 mr-1" />
+                            <Badge variant="outline" size="sm" maxWidth="80px">
+                              <Variable className="h-2 w-2 mr-1" />
                               {template.variables.length} variables
                             </Badge>
                           )}
@@ -678,7 +676,7 @@ export default function Templates() {
                       <h4 className="font-medium text-sm mb-2">Variables Used:</h4>
                       <div className="flex flex-wrap gap-1">
                         {template.variables.map((variable, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
+                          <Badge key={index} variant="outline" size="sm" maxWidth="100px" truncate={true}>
                             {`{${variable}}`}
                           </Badge>
                         ))}
