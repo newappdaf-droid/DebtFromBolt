@@ -303,13 +303,17 @@ export default function Dashboard() {
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <p className="font-medium truncate">{case_.debtor.name}</p>
-                      <StatusBadge status={case_.status} size="sm" />
+                      <p className="font-medium truncate text-sm max-w-[150px]" title={case_.debtor.name}>
+                        {case_.debtor.name}
+                      </p>
+                      <StatusBadge status={case_.status} size="sm" maxWidth="70px" />
                     </div>
                     <p className="text-xs text-muted-foreground">
                       <Money amount={case_.amount} currency={case_.currency} size="sm" />
                       {case_.assignedAgentName && (
-                        <span className="ml-2">• {case_.assignedAgentName}</span>
+                        <span className="ml-2 truncate max-w-[100px]" title={case_.assignedAgentName}>
+                          • {case_.assignedAgentName}
+                        </span>
                       )}
                     </p>
                   </div>
@@ -348,7 +352,9 @@ export default function Dashboard() {
                     onClick={() => navigate('/approvals')}
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{approval.caseName}</p>
+                      <p className="font-medium truncate text-sm max-w-[150px]" title={approval.caseName}>
+                        {approval.caseName}
+                      </p>
                       <p className="text-xs text-muted-foreground capitalize">
                         {approval.type.replace('_', ' ')}
                         {approval.amount && (
@@ -359,7 +365,7 @@ export default function Dashboard() {
                         )}
                       </p>
                     </div>
-                    <StatusBadge status={approval.state} size="sm" />
+                    <StatusBadge status={approval.state} size="sm" maxWidth="60px" />
                   </div>
                 ))}
               </div>
@@ -378,14 +384,16 @@ export default function Dashboard() {
                     onClick={() => navigate('/invoices')}
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{invoice.invoiceNumber}</p>
+                      <p className="font-medium truncate text-sm max-w-[120px]" title={invoice.invoiceNumber}>
+                        {invoice.invoiceNumber}
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         <Money amount={invoice.totalAmount} currency={invoice.currency} size="sm" />
                         {' • Due: '}
                         {new Date(invoice.dueDate).toLocaleDateString('en-GB')}
                       </p>
                     </div>
-                    <StatusBadge status={invoice.status} size="sm" />
+                    <StatusBadge status={invoice.status} size="sm" maxWidth="60px" />
                   </div>
                 ))}
               </div>
