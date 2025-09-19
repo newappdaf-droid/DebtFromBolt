@@ -487,7 +487,7 @@ export default function Tariffs() {
       <div className="grid gap-6">
         {filteredTariffs.length === 0 ? (
           <Card className="card-professional">
-            <CardContent className="py-12 text-center">
+            <CardContent className="py-8 text-center">
               <Calculator className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <h3 className="text-lg font-medium mb-2">No tariffs found</h3>
               <p className="text-muted-foreground">
@@ -501,15 +501,15 @@ export default function Tariffs() {
         ) : (
           filteredTariffs.map((tariff) => (
             <Card key={tariff.id} className="card-professional">
-              <CardContent className="p-6">
+              <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-start gap-4">
-                    <div className="p-3 bg-primary/10 rounded-lg">
+                    <div className="p-2 bg-primary/10 rounded-lg">
                       <Calculator className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-lg mb-1">{tariff.name}</h3>
-                      <p className="text-sm text-muted-foreground mb-2">{tariff.description}</p>
+                      <h3 className="font-semibold mb-1">{tariff.name}</h3>
+                      <p className="text-xs text-muted-foreground mb-2">{tariff.description}</p>
                       <div className="flex items-center gap-2">
                         <Badge variant={tariff.isActive ? 'default' : 'secondary'}>
                           {tariff.isActive ? 'Active' : 'Inactive'}
@@ -545,8 +545,8 @@ export default function Tariffs() {
                 </div>
                 
                 {/* Pricing Structure */}
-                <div className="bg-accent/50 rounded-lg p-4 mb-4">
-                  <h4 className="font-medium text-sm mb-3">Pricing Structure</h4>
+                <div className="bg-accent/50 rounded-lg p-3 mb-3">
+                  <h4 className="font-medium text-xs mb-2">Pricing Structure</h4>
                   
                   {tariff.type === 'percentage' && (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">

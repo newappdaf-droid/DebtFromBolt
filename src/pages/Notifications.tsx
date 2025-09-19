@@ -440,7 +440,7 @@ export default function Notifications() {
         </CardHeader>
         <CardContent>
           {filteredNotifications.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="text-center py-8">
               <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <h3 className="text-lg font-medium mb-2">No notifications found</h3>
               <p className="text-muted-foreground">
@@ -450,7 +450,7 @@ export default function Notifications() {
               </p>
             </div>
           ) : (
-            <div className="space-y-1">
+            <div className="space-y-0">
               {filteredNotifications.map((notification) => {
                 const Icon = notificationIcons[notification.type];
                 const isUnread = !notification.readAt;
@@ -460,7 +460,7 @@ export default function Notifications() {
                   <div
                     key={notification.id}
                     className={cn(
-                      'flex items-start gap-4 p-4 rounded-lg border transition-colors',
+                      'flex items-start gap-3 p-3 border-b transition-colors',
                       isUnread ? 'bg-primary/5 border-primary/20' : 'bg-background border-border',
                       'hover:bg-accent/50 cursor-pointer',
                       isSelected && 'ring-2 ring-primary/50'
@@ -480,15 +480,15 @@ export default function Notifications() {
                       className="flex-1 min-w-0"
                       onClick={() => handleNotificationClick(notification)}
                     >
-                      <div className="flex items-start justify-between gap-4 mb-2">
+                      <div className="flex items-start justify-between gap-4 mb-1">
                         <div className="flex-1 min-w-0">
                           <h4 className={cn(
-                            'font-medium truncate',
+                            'font-medium truncate text-sm',
                             isUnread && 'text-foreground'
                           )}>
                             {notification.title}
                           </h4>
-                          <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                          <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
                             {notification.message}
                           </p>
                         </div>

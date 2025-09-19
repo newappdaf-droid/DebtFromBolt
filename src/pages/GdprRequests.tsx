@@ -655,7 +655,7 @@ export default function GdprRequests() {
         </CardHeader>
         <CardContent>
           {filteredRequests.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="text-center py-8">
               <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <h3 className="text-lg font-medium mb-2">No GDPR requests found</h3>
               <p className="text-muted-foreground">
@@ -669,13 +669,13 @@ export default function GdprRequests() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">TYPE</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">SUBJECT</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">STATUS</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">REQUESTED</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">DUE DATE</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">ACTIONS</th>
+                  <tr className="border-b bg-muted/30">
+                    <th className="text-left py-2 px-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">TYPE</th>
+                    <th className="text-left py-2 px-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">SUBJECT</th>
+                    <th className="text-left py-2 px-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">STATUS</th>
+                    <th className="text-left py-2 px-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">REQUESTED</th>
+                    <th className="text-left py-2 px-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">DUE DATE</th>
+                    <th className="text-left py-2 px-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">ACTIONS</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -686,25 +686,25 @@ export default function GdprRequests() {
                     
                     return (
                       <tr key={request.id} className="border-b hover:bg-muted/30 transition-colors">
-                        <td className="py-4 px-4">
+                        <td className="py-2 px-3">
                           <div className="flex items-center gap-2">
                             <div className={`p-1.5 rounded ${request.type === 'SAR' ? 'bg-warning/10' : 'bg-destructive/10'}`}>
                               <TypeIcon className={`h-4 w-4 ${request.type === 'SAR' ? 'text-warning' : 'text-destructive'}`} />
                             </div>
-                            <span className="font-medium text-sm">
+                            <span className="font-medium text-xs">
                               {request.type}
                             </span>
                           </div>
                         </td>
-                        <td className="py-4 px-4">
+                        <td className="py-2 px-3">
                           <div>
-                            <p className="font-medium">{request.dataSubject}</p>
+                            <p className="font-medium text-sm">{request.dataSubject}</p>
                             {request.dataSubjectEmail && (
-                              <p className="text-sm text-muted-foreground">{request.dataSubjectEmail}</p>
+                              <p className="text-xs text-muted-foreground">{request.dataSubjectEmail}</p>
                             )}
                           </div>
                         </td>
-                        <td className="py-4 px-4">
+                        <td className="py-2 px-3">
                           <Badge 
                             variant={
                               request.status === 'completed' ? 'default' :
@@ -719,21 +719,21 @@ export default function GdprRequests() {
                              request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                           </Badge>
                         </td>
-                        <td className="py-4 px-4">
-                          <div className="text-sm">
-                            <p>{format(new Date(request.createdAt), 'dd/MM/yyyy')}</p>
+                        <td className="py-2 px-3">
+                          <div className="text-xs">
+                            <p className="text-sm">{format(new Date(request.createdAt), 'dd/MM/yyyy')}</p>
                             <p className="text-muted-foreground">by {request.requestedByName}</p>
                           </div>
                         </td>
-                        <td className="py-4 px-4">
-                          <div className="text-sm">
-                            <p>{format(new Date(request.dueDate), 'dd/MM/yyyy')}</p>
+                        <td className="py-2 px-3">
+                          <div className="text-xs">
+                            <p className="text-sm">{format(new Date(request.dueDate), 'dd/MM/yyyy')}</p>
                             {isOverdue && (
-                              <p className="text-destructive font-medium">Overdue</p>
+                              <p className="text-destructive font-medium text-xs">Overdue</p>
                             )}
                           </div>
                         </td>
-                        <td className="py-4 px-4">
+                        <td className="py-2 px-3">
                           <div className="flex gap-1">
                             <Button
                               variant="ghost"

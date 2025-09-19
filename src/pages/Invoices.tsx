@@ -582,7 +582,7 @@ export default function Invoices() {
       <Card className="card-professional">
         <CardContent className="p-0">
           {filteredInvoices.length === 0 ? (
-            <div className="py-12 text-center">
+            <div className="py-8 text-center">
               <Receipt className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <h3 className="text-lg font-medium mb-2">No invoices found</h3>
               <p className="text-muted-foreground">
@@ -595,7 +595,7 @@ export default function Invoices() {
           ) : (
             <Table>
               <TableHeader>
-                <TableRow className="border-b-2">
+                <TableRow>
                   <TableHead className="font-semibold text-foreground">INVOICE</TableHead>
                   <TableHead className="font-semibold text-foreground">CASE</TableHead>
                   <TableHead className="font-semibold text-foreground">CLIENT</TableHead>
@@ -612,45 +612,45 @@ export default function Invoices() {
                   
                   return (
                     <TableRow key={invoice.id} className="hover:bg-muted/30 cursor-pointer" onClick={() => handleViewInvoice(invoice)}>
-                      <TableCell className="py-4">
+                      <TableCell>
                         <div>
-                          <p className="font-semibold text-primary">{invoice.invoiceNumber}</p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="font-medium text-primary">{invoice.invoiceNumber}</p>
+                          <p className="text-xs text-muted-foreground">
                             Issued {format(new Date(invoice.createdAt), 'dd/MM/yyyy')}
                           </p>
                         </div>
                       </TableCell>
-                      <TableCell className="py-4">
+                      <TableCell>
                         <div>
-                          <p className="font-medium text-primary">{invoice.caseName}</p>
-                          <p className="text-sm text-muted-foreground">Case reference</p>
+                          <p className="font-medium">{invoice.caseName}</p>
+                          <p className="text-xs text-muted-foreground">Case reference</p>
                         </div>
                       </TableCell>
-                      <TableCell className="py-4">
+                      <TableCell>
                         <p className="font-medium">{invoice.clientName}</p>
                       </TableCell>
-                      <TableCell className="py-4 text-right">
+                      <TableCell className="text-right">
                         <div>
-                          <p className="font-bold text-lg">
+                          <p className="font-bold">
                             <Money amount={invoice.totalAmount} currency={invoice.currency} />
                           </p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-xs text-muted-foreground">
                             VAT: <Money amount={invoice.vatAmount} currency={invoice.currency} />
                           </p>
                         </div>
                       </TableCell>
-                      <TableCell className="py-4">
+                      <TableCell>
                         <StatusBadge status={invoice.status} />
                       </TableCell>
-                      <TableCell className="py-4">
-                        <p className="font-medium">{format(new Date(invoice.dueDate), 'dd/MM/yyyy')}</p>
+                      <TableCell>
+                        <p className="text-sm font-medium">{format(new Date(invoice.dueDate), 'dd/MM/yyyy')}</p>
                         {invoice.paidAt && (
-                          <p className="text-sm text-success">
+                          <p className="text-xs text-success">
                             Paid {format(new Date(invoice.paidAt), 'dd/MM/yyyy')}
                           </p>
                         )}
                       </TableCell>
-                      <TableCell className="py-4 text-right">
+                      <TableCell className="text-right">
                         <div className="flex gap-1 justify-end">
                           <Button
                             variant="ghost"

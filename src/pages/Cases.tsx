@@ -409,7 +409,7 @@ export default function Cases() {
                             value={savedViewName}
                             onChange={(e) => setSavedViewName(e.target.value)}
                             placeholder="Enter view name..."
-                          />
+                    <TableCell colSpan={11} className="text-center py-8">
                         </div>
                       </div>
                       <DialogFooter>
@@ -561,7 +561,7 @@ export default function Cases() {
                   <div className="text-destructive">Failed to load cases: {error}</div>
                 </TableCell>
               </TableRow>
-            ) : paginatedCases.length === 0 ? (
+                    <TableCell colSpan={11} className="text-center py-8">
               <TableRow>
                 <TableCell colSpan={9} className="text-center py-12">
                   <div className="flex flex-col items-center gap-2">
@@ -589,10 +589,10 @@ export default function Cases() {
                       <Checkbox
                         checked={selectedCases.includes(case_.CaseId)}
                         onCheckedChange={() => toggleCaseSelection(case_.CaseId)}
-                      />
+                        <TableCell>
                     </TableCell>
                     <TableCell className="font-medium">
-                      <Link 
+                            className="font-medium text-primary hover:underline"
                         to={`/cases/${case_.CaseId}`}
                         className="text-primary hover:underline"
                       >
@@ -625,13 +625,13 @@ export default function Cases() {
                           {case_.Priority}
                         </Badge>
                       )}
-                    </TableCell>
+                          <span className="font-mono text-sm">€{Math.floor(Math.random() * 50000 + 1000).toLocaleString()}</span>
                     <TableCell className="text-right">
                       <span className="font-mono">€{Math.floor(Math.random() * 50000 + 1000).toLocaleString()}</span>
                     </TableCell>
                     <TableCell>
                       {case_.AssignedToUserId ? (
-                        <span className="text-sm">Agent {case_.AssignedToUserId.split('_')[1]}</span>
+                            <span className="text-xs text-muted-foreground italic">Unassigned</span>
                       ) : (
                         <span className="text-sm text-muted-foreground italic">Unassigned</span>
                       )}
@@ -673,7 +673,7 @@ export default function Cases() {
                   </TableRow>
                 );
               })
-            )}
+                    <TableCell colSpan={11} className="text-center py-8">
           </TableBody>
         </Table>
       </Card>

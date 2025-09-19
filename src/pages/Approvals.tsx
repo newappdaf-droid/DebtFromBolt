@@ -560,7 +560,7 @@ export default function Approvals() {
       <Card className="card-professional">
         <CardContent className="p-0">
           {filteredApprovals.length === 0 ? (
-            <div className="py-12 text-center">
+            <div className="py-8 text-center">
               <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <h3 className="text-lg font-medium mb-2">No approval requests found</h3>
               <p className="text-muted-foreground">
@@ -573,70 +573,75 @@ export default function Approvals() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b">
+                <thead className="bg-muted/30 border-b">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       CASE
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       TYPE
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       AMOUNT
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       STATUS
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       REQUESTED
                     </th>
-                    <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       ACTIONS
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="divide-y divide-border">
                   {filteredApprovals.map((approval) => (
-                    <tr key={approval.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4">
+                    <tr key={approval.id} className="hover:bg-muted/30">
+                      <td className="px-3 py-2">
                         <div>
-                          <p className="font-medium text-gray-900">{approval.caseName}</p>
-                          <p className="text-sm text-gray-500 line-clamp-1">{approval.description}</p>
+                          <button
+                            onClick={() => navigate(`/cases/${approval.caseId}`)}
+                            className="font-medium text-primary hover:text-primary/80 hover:underline text-left"
+                          >
+                            {approval.caseName}
+                          </button>
+                          <p className="text-xs text-muted-foreground line-clamp-1">{approval.description}</p>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-2">
                         <Badge className={typeConfig[approval.type as keyof typeof typeConfig]?.color || 'bg-gray-100 text-gray-800'}>
                           {typeConfig[approval.type as keyof typeof typeConfig]?.label || approval.type}
                         </Badge>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-2">
                         <div className="font-medium">
                           <Money amount={approval.amount || 0} currency={approval.currency || 'EUR'} />
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-2">
                         <Badge className={statusConfig[approval.state].color}>
                           {statusConfig[approval.state].label}
                         </Badge>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm">
-                          <p className="text-gray-900">{format(new Date(approval.createdAt), 'dd/MM/yyyy')}</p>
-                          <p className="text-gray-500">by {approval.requestedByName}</p>
+                      <td className="px-3 py-2">
+                        <div className="text-xs">
+                          <p className="text-sm">{format(new Date(approval.createdAt), 'dd/MM/yyyy')}</p>
+                          <p className="text-muted-foreground">by {approval.requestedByName}</p>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-right">
+                      <td className="px-3 py-2 text-right">
                         {approval.state === 'pending' ? (
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => handleReviewApproval(approval)}
-                            className="text-blue-600 border-blue-600 hover:bg-blue-50"
+                            className="text-primary border-primary hover:bg-primary/10"
                           >
                             Review
                           </Button>
                         ) : (
-                          <span className="text-sm text-gray-400">
+                          <span className="text-xs text-muted-foreground">
                             {approval.state === 'approved' ? 'Approved' : 'Rejected'}
                           </span>
                         )}
