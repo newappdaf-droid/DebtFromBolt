@@ -54,6 +54,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { toast } from '@/hooks/use-toast';
+import { StatusBadge } from '@/components/ui/status-badge';
 
 import type { MessageTemplate, TemplateVariable } from '@/types';
 
