@@ -182,13 +182,35 @@ All colors MUST be HSL for consistency.
   
   /* Professional Card System */
   .card-professional {
-    @apply bg-card border border-border rounded-md shadow-sm;
+    @apply bg-card border border-border rounded-lg shadow-sm;
     box-shadow: var(--shadow-card);
   }
   
   .card-elevated {
-    @apply bg-card border border-border rounded-md;
+    @apply bg-card border border-border rounded-lg;
     box-shadow: var(--shadow-popover);
+  }
+  
+  /* Compact Table System */
+  .table-compact .table-head {
+    @apply h-8 px-3 py-2 text-xs;
+  }
+  
+  .table-compact .table-cell {
+    @apply px-3 py-2 text-sm;
+  }
+  
+  /* Compact Card System */
+  .card-compact {
+    @apply p-4;
+  }
+  
+  .card-compact .card-header {
+    @apply pb-2;
+  }
+  
+  .card-compact .card-content {
+    @apply space-y-2;
   }
   
   /* Professional Form System */

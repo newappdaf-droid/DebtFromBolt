@@ -103,10 +103,9 @@ export function StatusBadge({
   return (
     <Badge 
       variant={displayVariant}
+      size={size}
       className={cn(
         config.className,
-        size === 'sm' && 'text-xs px-2 py-0.5',
-        size === 'lg' && 'text-sm px-3 py-1',
         'font-medium border',
         className
       )}

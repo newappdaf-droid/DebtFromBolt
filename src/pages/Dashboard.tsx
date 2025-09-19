@@ -288,9 +288,9 @@ export default function Dashboard() {
             <CardTitle className="text-lg">Recent Cases</CardTitle>
             <CardDescription>Your most recently updated cases</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-2">
             {recentCases.length === 0 ? (
-              <div className="text-center py-6 text-muted-foreground">
+              <div className="text-center py-4 text-muted-foreground">
                 <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
                 <p>No cases found</p>
               </div>
@@ -298,15 +298,15 @@ export default function Dashboard() {
               recentCases.map((case_) => (
                 <div
                   key={case_.id}
-                  className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 cursor-pointer transition-colors"
+                  className="flex items-center justify-between p-2 rounded-lg border hover:bg-accent/50 cursor-pointer transition-colors"
                   onClick={() => navigate(`/cases/${case_.id}`)}
                 >
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-0.5">
                       <p className="font-medium truncate">{case_.debtor.name}</p>
                       <StatusBadge status={case_.status} size="sm" />
                     </div>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs text-muted-foreground">
                       <Money amount={case_.amount} currency={case_.currency} size="sm" />
                       {case_.assignedAgentName && (
                         <span className="ml-2">• {case_.assignedAgentName}</span>
@@ -319,7 +319,7 @@ export default function Dashboard() {
             {recentCases.length > 0 && (
               <Button 
                 variant="ghost" 
-                className="w-full mt-4"
+                className="w-full mt-2"
                 onClick={() => navigate('/cases')}
               >
                 View All Cases
@@ -334,22 +334,22 @@ export default function Dashboard() {
             <CardTitle className="text-lg">Pending Actions</CardTitle>
             <CardDescription>Items requiring your attention</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-2">
             {/* Pending Approvals */}
             {pendingApprovals.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
+              <div className="space-y-1">
+                <h4 className="font-medium text-xs text-muted-foreground uppercase tracking-wide">
                   Approvals ({pendingApprovals.length})
                 </h4>
                 {pendingApprovals.slice(0, 3).map((approval) => (
                   <div
                     key={approval.id}
-                    className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 cursor-pointer transition-colors"
+                    className="flex items-center justify-between p-2 rounded-lg border hover:bg-accent/50 cursor-pointer transition-colors"
                     onClick={() => navigate('/approvals')}
                   >
                     <div className="flex-1 min-w-0">
                       <p className="font-medium truncate">{approval.caseName}</p>
-                      <p className="text-sm text-muted-foreground capitalize">
+                      <p className="text-xs text-muted-foreground capitalize">
                         {approval.type.replace('_', ' ')}
                         {approval.amount && (
                           <>
@@ -367,19 +367,19 @@ export default function Dashboard() {
 
             {/* Overdue Invoices */}
             {overdueInvoices.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
+              <div className="space-y-1">
+                <h4 className="font-medium text-xs text-muted-foreground uppercase tracking-wide">
                   Overdue Invoices ({overdueInvoices.length})
                 </h4>
                 {overdueInvoices.slice(0, 2).map((invoice) => (
                   <div
                     key={invoice.id}
-                    className="flex items-center justify-between p-3 rounded-lg border hover:bg-accent/50 cursor-pointer transition-colors"
+                    className="flex items-center justify-between p-2 rounded-lg border hover:bg-accent/50 cursor-pointer transition-colors"
                     onClick={() => navigate('/invoices')}
                   >
                     <div className="flex-1 min-w-0">
                       <p className="font-medium truncate">{invoice.invoiceNumber}</p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs text-muted-foreground">
                         <Money amount={invoice.totalAmount} currency={invoice.currency} size="sm" />
                         {' • Due: '}
                         {new Date(invoice.dueDate).toLocaleDateString('en-GB')}
@@ -392,10 +392,10 @@ export default function Dashboard() {
             )}
 
             {pendingApprovals.length === 0 && overdueInvoices.length === 0 && (
-              <div className="text-center py-6 text-muted-foreground">
+              <div className="text-center py-4 text-muted-foreground">
                 <CheckCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
                 <p>All caught up!</p>
-                <p className="text-sm">No pending actions at this time</p>
+                <p className="text-xs">No pending actions at this time</p>
               </div>
             )}
           </CardContent>

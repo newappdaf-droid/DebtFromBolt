@@ -570,7 +570,7 @@ export default function RetentionPolicy() {
           <div className="grid gap-6">
             {filteredRules.length === 0 ? (
               <Card className="card-professional">
-                <CardContent className="py-12 text-center">
+                <CardContent className="py-8 text-center">
                   <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <h3 className="text-lg font-medium mb-2">No retention rules found</h3>
                   <p className="text-muted-foreground">
@@ -585,15 +585,15 @@ export default function RetentionPolicy() {
                 
                 return (
                   <Card key={rule.id} className="card-professional">
-                    <CardContent className="p-6">
+                    <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-start gap-4">
-                          <div className="p-3 bg-primary/10 rounded-lg">
+                          <div className="p-2 bg-primary/10 rounded-lg">
                             <DataTypeIcon className="h-6 w-6 text-primary" />
                           </div>
                           <div>
-                            <h3 className="font-semibold text-lg mb-1">{rule.name}</h3>
-                            <p className="text-sm text-muted-foreground mb-2">{rule.description}</p>
+                            <h3 className="font-semibold mb-1">{rule.name}</h3>
+                            <p className="text-xs text-muted-foreground mb-2">{rule.description}</p>
                             <div className="flex items-center gap-2">
                               <Badge variant={rule.isActive ? 'default' : 'secondary'}>
                                 {rule.isActive ? 'Active' : 'Inactive'}
