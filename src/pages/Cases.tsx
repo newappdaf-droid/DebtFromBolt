@@ -22,6 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { casesApi } from '@/lib/api/casesApi';
+import { StatusBadge } from '@/components/ui/status-badge';
 import { CaseSummary, CaseFilters, SavedView, CasePhase, CaseZone } from '@/types/cases';
 import { AIHelpButton } from '@/components/ai/AIHelpButton';
 import { useTranslation } from '@/contexts/TranslationContext';
