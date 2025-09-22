@@ -122,6 +122,7 @@ export function CaseDocumentsTab({ caseId, onUpdate }: CaseDocumentsTabProps) {
   };
 
   const getDocumentIcon = (mimeType: string) => {
+    if (!mimeType) return File;
     if (mimeType.includes('image')) return Image;
     if (mimeType.includes('pdf')) return FileText;
     return File;
