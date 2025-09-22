@@ -20,6 +20,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { StatusBadge } from '@/components/ui/status-badge';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { Notification, NotificationType } from '@/types';
 import { cn } from '@/lib/utils';
