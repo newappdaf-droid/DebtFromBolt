@@ -171,13 +171,13 @@ class MockDataStore {
       const caseDocument: CaseDocument = {
         DocumentId: doc.id,
         CaseId: doc.caseId,
-        Type: doc.type as "Contract" | "Invoice" | "Receipt" | "Legal" | "Other",
+        Type: (doc.type as "Invoice" | "PoA" | "CourtFiling" | "ProofOfPayment" | "ID" | "Other") || "Other",
         FileName: doc.name,
-        MimeType: doc.mimeType,
+        MimeType: doc.mimeType || 'application/octet-stream',
         StorageKey: `documents/${doc.caseId}/${doc.name}`,
-        Size: doc.size,
-        Version: doc.version,
-        UploadedBy: doc.uploadedBy,
+        Size: doc.size || 0,
+        Version: doc.version || 1,
+        UploadedBy: doc.uploadedBy || 'unknown',
         UploadedAt: doc.uploadedAt,
         Hash: doc.hash || Math.random().toString(36).substring(2, 15)
       };
