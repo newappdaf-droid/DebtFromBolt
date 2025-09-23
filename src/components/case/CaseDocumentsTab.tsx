@@ -249,7 +249,7 @@ export function CaseDocumentsTab({ caseId, onUpdate }: CaseDocumentsTabProps) {
                       <TableCell>{formatFileSize(document.Size)}</TableCell>
                       <TableCell>
                         <div>
-                          <p className="text-sm">{format(new Date(document.UploadedAt), 'MMM dd, yyyy')}</p>
+                          <p className="text-sm">{document.UploadedAt ? format(new Date(document.UploadedAt), 'MMM dd, yyyy') : 'N/A'}</p>
                           {document.UploadedBy && (
                             <p className="text-xs text-muted-foreground">by {document.UploadedBy}</p>
                           )}
